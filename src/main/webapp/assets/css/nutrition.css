@@ -1,0 +1,364 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 14, 2025, 3:24:47 PM
+    Author     : Admin
+*/
+
+/* Nutrition Section */
+.nutrition-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.nutrition-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.nutrition-header h2 {
+    color: var(--gray-900);
+    margin-bottom: 1.5rem;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    background: var(--white);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.tab-btn i {
+    font-size: 1.1rem;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Search Form */
+.search-form {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.form-group {
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Nutrition Table */
+.nutrition-table-container {
+    margin-top: 2rem;
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nutrition-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.nutrition-table thead {
+    background-color: #ff6b6b;
+}
+
+.nutrition-table > thead > tr {
+    background-color: #ff6b6b;
+}
+
+.nutrition-table > thead > tr > th {
+    background-color: #ff6b6b;
+    color: #ffffff !important;
+    font-weight: 600;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid #e9ecef;
+    white-space: nowrap;
+}
+
+.nutrition-table th {
+    background-color: #ff6b6b !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid #e9ecef;
+    white-space: nowrap;
+}
+
+.nutrition-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    color: #495057;
+}
+
+.nutrition-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.nutrition-table th:first-child,
+.nutrition-table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.nutrition-table tr:hover td:first-child {
+    background-color: #f8f9fa;
+}
+
+/* Column widths */
+.nutrition-table th:nth-child(1),
+.nutrition-table td:nth-child(1) {
+    min-width: 150px;
+}
+
+.nutrition-table th:nth-child(2),
+.nutrition-table td:nth-child(2) {
+    min-width: 100px;
+}
+
+.nutrition-table th:nth-child(3),
+.nutrition-table td:nth-child(3) {
+    min-width: 80px;
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.nutrition-table th:nth-child(4),
+.nutrition-table td:nth-child(4),
+.nutrition-table th:nth-child(5),
+.nutrition-table td:nth-child(5) {
+    min-width: 100px;
+    color: #f39c12;
+}
+
+.nutrition-table th:nth-child(6),
+.nutrition-table td:nth-child(6),
+.nutrition-table th:nth-child(7),
+.nutrition-table td:nth-child(7) {
+    min-width: 100px;
+    color: #3498db;
+}
+
+.nutrition-table th:nth-child(8),
+.nutrition-table td:nth-child(8) {
+    min-width: 120px;
+    color: #2ecc71;
+}
+
+.nutrition-table th:nth-child(9),
+.nutrition-table td:nth-child(9),
+.nutrition-table th:nth-child(10),
+.nutrition-table td:nth-child(10) {
+    min-width: 80px;
+    color: #9b59b6;
+}
+
+.nutrition-table th:nth-child(11),
+.nutrition-table td:nth-child(11) {
+    min-width: 80px;
+    color: #e67e22;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nutrition-table {
+        font-size: 0.8rem;
+    }
+
+    .nutrition-table th,
+    .nutrition-table td {
+        padding: 0.75rem;
+    }
+}
+
+/* No results message */
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Ingredients List */
+.ingredients-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+}
+
+.ingredients-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+}
+
+.ingredient-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ingredient-info img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+.ingredient-details h4 {
+    margin-bottom: 0.25rem;
+    color: var(--gray-900);
+}
+
+.ingredient-details p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.ingredient-quantity {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Meal Plan */
+.meal-plan-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+}
+
+.meal-plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.meal-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+}
+
+.meal-day {
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+}
+
+.meal-day h4 {
+    color: var(--gray-900);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.meal-item {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.meal-item h5 {
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.meal-item p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tab-navigation {
+        flex-wrap: wrap;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    .meal-plan-grid {
+        grid-template-columns: 1fr;
+    }
+}

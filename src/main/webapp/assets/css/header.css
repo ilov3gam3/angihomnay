@@ -1,0 +1,251 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 14, 2025, 3:23:43 PM
+    Author     : Admin
+*/
+
+/* Header Styles */
+.header {
+    background-color: var(--white);
+    box-shadow: var(--shadow-sm);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1500;
+    height: 80px;
+}
+
+.header-container {
+    max-width: 1900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo */
+.logo h1 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Navigation */
+.main-nav {
+    flex: 1;
+    margin: 0 2rem;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: var(--gray-700);
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.main-nav a:hover {
+    color: var(--primary-color);
+    background-color: var(--gray-100);
+}
+
+.main-nav a.active {
+    color: var(--primary-color);
+    background-color: var(--gray-100);
+}
+
+/* User Actions */
+.user-actions {
+    display: flex;
+    gap: 1rem;
+    white-space: nowrap;
+}
+
+.btn-login, .btn-register {
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.btn-login {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-register {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+}
+
+.btn-login:hover {
+    background-color: var(--gray-100);
+}
+
+.btn-register:hover {
+    background-color: var(--primary-color);
+    opacity: 0.9;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .header-container {
+        padding: 0 0.5rem;
+    }
+
+    .main-nav {
+        margin: 0 1rem;
+    }
+
+    .main-nav a {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-login, .btn-register {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--white);
+        padding: 1rem;
+        box-shadow: var(--shadow-md);
+        margin: 0;
+    }
+
+    .main-nav.active {
+        display: block;
+    }
+
+    .main-nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .main-nav a {
+        display: block;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .user-actions {
+        display: none;
+    }
+
+    .user-actions.active {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem;
+    }
+    /* User Info Styles */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: var(--gray-100);
+    }
+
+    .user-info:hover {
+        background-color: var(--gray-200);
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+    }
+
+    /* Small Avatar Option */
+    .avatar-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    /* User Initial Option */
+    .user-initial {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Dropdown Arrow */
+    .user-info i {
+        color: var(--gray-500);
+        font-size: 0.8rem;
+        transition: transform 0.3s ease;
+    }
+
+    .user-info.active i {
+        transform: rotate(180deg);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .user-name {
+            display: none; /* Hide name on mobile, show only avatar/initial */
+        }
+
+        .user-info {
+            padding: 0.5rem;
+        }
+    }
+} 
