@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebFilter(urlPatterns = {
-        "/admin/*", "/customer/*", "/restaurant/*", "/update-avatar", "/change-password"
+        "/admin/*", "/customer/*", "/restaurant/*", "/update-avatar", "/change-password", "/user/profile"
 })
 public class AuthFilter implements Filter {
     @Override
@@ -20,7 +20,7 @@ public class AuthFilter implements Filter {
         HttpSession session = req.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
         if (user == null) {
-            req.getSession().setAttribute("flash_success", "Vui lòng đăng nhập.");
+            req.getSession().setAttribute("flash_eror", "Vui lòng đăng nhập.");
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }

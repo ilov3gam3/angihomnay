@@ -4,7 +4,7 @@ import Model.Constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -24,16 +24,15 @@ public class Customer {
     private String firstName;
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String lastName;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
-    private String address;
 
-    public Customer(User user, String firstName, String lastName, Date dateOfBirth, Gender gender, String address) {
+    public Customer(User user, String firstName, String lastName, LocalDate dateOfBirth, Gender gender) {
         this.user = user;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
-        this.address = address;
     }
 }

@@ -56,7 +56,7 @@
 
         <div class="social-login">
             <p>Hoặc đăng nhập bằng</p>
-            <a href="<%= request.getContextPath()%>/google-oauth" class="social-btn google">
+            <a href="<%= request.getContextPath()%>/google/oauth" class="social-btn google">
                 <i class="fab fa-google"></i>
                 Đăng nhập với Google
             </a>

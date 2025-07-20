@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class CustomerController {
     @WebServlet("/customer/profile")
@@ -29,16 +29,14 @@ public class CustomerController {
             CustomerDao customerDao = new CustomerDao();
             String firstName = req.getParameter("firstName");
             String lastName = req.getParameter("lastName");
-            Date dateOfBirth = Date.valueOf(req.getParameter("dateOfBirth"));
+            LocalDate dateOfBirth = LocalDate.parse(req.getParameter("dateOfBirth"));
             Gender gender = Gender.valueOf(req.getParameter("gender"));
-            String address = req.getParameter("address");
             User user = (User) req.getSession().getAttribute("user");
             Customer customer = customerDao.getById(user.getId());
             customer.setFirstName(firstName);
             customer.setLastName(lastName);
             customer.setDateOfBirth(dateOfBirth);
             customer.setGender(gender);
-            customer.setAddress(address);
             customerDao.update(customer);
             req.getSession().setAttribute("flash_success", "Cập nhật người dùng thành công.");
             resp.sendRedirect(req.getContextPath() + "/customer/profile");

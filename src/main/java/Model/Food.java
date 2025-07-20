@@ -19,7 +19,7 @@ public class Food extends DistributedEntity {
     private String description;
     private double price;
     private String image;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="categories_food",
             joinColumns = @JoinColumn(name = "food_id"),

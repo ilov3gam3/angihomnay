@@ -33,7 +33,7 @@ public class RoleFilter implements Filter {
         if (uri.startsWith(req.getContextPath() + "/admin") && role != Role.ADMIN
                 || uri.startsWith(req.getContextPath() + "/customer") && role != Role.CUSTOMER
                 || uri.startsWith(req.getContextPath() + "/restaurant") && role != Role.RESTAURANT) {
-            req.getSession().setAttribute("flash_success", "Bạn không có quyền truy cập tài nguyên này.");
+            req.getSession().setAttribute("flash_error", "Bạn không có quyền truy cập tài nguyên này.");
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }

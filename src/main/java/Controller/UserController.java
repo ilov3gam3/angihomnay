@@ -19,9 +19,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
 import java.io.IOException;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -109,14 +117,14 @@ public class UserController {
             });
             executorService.shutdown();
             // end send mail
-            User user = new User(email, BCrypt.hashpw(password, BCrypt.gensalt()), "/assets/img/default-avatar.jpg", phone, token, false, false, Role.CUSTOMER);
+            String address = req.getParameter("address");
+            User user = new User(email, BCrypt.hashpw(password, BCrypt.gensalt()), "/assets/img/default-avatar.jpg", phone, address, token, false, false, Role.CUSTOMER);
             userDao.save(user);
             String firstName = req.getParameter("firstName");
             String lastName = req.getParameter("lastName");
-            Date dob = Date.valueOf(req.getParameter("dob"));
+            LocalDate dob = LocalDate.parse(req.getParameter("dob"));
             Gender gender = Gender.valueOf(req.getParameter("gender"));
-            String address = req.getParameter("address");
-            Customer customer = new Customer(user, firstName, lastName, dob, gender, address);
+            Customer customer = new Customer(user, firstName, lastName, dob, gender);
             customerDao.save(customer);
             req.getSession().setAttribute("flash_success", "Đăng kí thành công, vui lòng kiểm tra email.");
             resp.sendRedirect(req.getContextPath() + "/login");
@@ -132,7 +140,7 @@ public class UserController {
                 user.setToken(null);
                 user.setVerified(true);
                 new UserDao().update(user);
-                req.getSession().setAttribute("flash_success", "Đăng kí thành công, vui lòng kiểm tra email.");
+                req.getSession().setAttribute("flash_success", "Xác thực tài khoản thành công.");
             } else {
                 req.getSession().setAttribute("flash_error", "Token không tồn tại hoặc không hợp lệ");
             }
@@ -193,7 +201,7 @@ public class UserController {
             User user = new UserDao().findByToken(token);
             if (user != null) {
                 String password = req.getParameter("password");
-                String re_password = req.getParameter("re_password");
+                String re_password = req.getParameter("confirmPassword");
                 if (password.equals(re_password) && !password.isEmpty()) {
                     user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
                     new UserDao().update(user);
@@ -215,8 +223,8 @@ public class UserController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             UserDao userDao = new UserDao();
             List<User> users = userDao.getAll();
-            List<Customer> customers = new CustomerDao().getAll();
-            List<Restaurant> restaurants = new RestaurantDao().getAll();
+            List<Customer> customers = new CustomerDao().getAllWithUsers();
+            List<Restaurant> restaurants = new RestaurantDao().getAllWithUsers();
             req.setAttribute("users", users);
             req.setAttribute("customers", customers);
             req.setAttribute("restaurants", restaurants);
@@ -230,6 +238,7 @@ public class UserController {
             String email = req.getParameter("email");
             String phone = req.getParameter("phone");
             Role role = Role.valueOf(req.getParameter("role"));
+            String address = req.getParameter("address");
             if (userDao.findByEmail(email)!=null) {
                 req.getSession().setAttribute("flash_error", "Email đã được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/admin/user");
@@ -240,27 +249,26 @@ public class UserController {
                 resp.sendRedirect(req.getContextPath() + "/admin/user");
                 return;
             }
-            User user = new User(email, BCrypt.hashpw(password, BCrypt.gensalt()), "/assets/img/default-avatar.jpg", phone, null, true, false, role);
+            User user = new User(email, BCrypt.hashpw(password, BCrypt.gensalt()), "/assets/img/default-avatar.jpg", phone, address, null, true, false, role);
             userDao.save(user);
             if (role == Role.CUSTOMER){
                 CustomerDao customerDao = new CustomerDao();
                 String firstName = req.getParameter("firstName");
                 String lastName = req.getParameter("lastName");
-                Date dob = Date.valueOf(req.getParameter("dob"));
+                LocalDate dob = LocalDate.parse(req.getParameter("dob"));
                 Gender gender = Gender.valueOf(req.getParameter("gender"));
-                String address = req.getParameter("address");
-                Customer customer = new Customer(user, firstName, lastName, dob, gender, address);
+                Customer customer = new Customer(user, firstName, lastName, dob, gender);
                 customerDao.save(customer);
             }
             if (role == Role.RESTAURANT){
                 RestaurantDao restaurantDao = new RestaurantDao();
-                String address = req.getParameter("address");
+                String name = req.getParameter("name");
                 String mapEmbedUrl = req.getParameter("mapEmbedUrl");
                 LocalTime openTime = LocalTime.parse(req.getParameter("openTime"));
                 LocalTime closeTime = LocalTime.parse(req.getParameter("closeTime"));
                 Restaurant restaurant = new Restaurant();
                 restaurant.setUser(user);
-                restaurant.setAddress(address);
+                restaurant.setName(name);
                 restaurant.setMapEmbedUrl(mapEmbedUrl);
                 restaurant.setOpenTime(openTime);
                 restaurant.setCloseTime(closeTime);
@@ -284,47 +292,45 @@ public class UserController {
             }
             String email = req.getParameter("email");
             String phone = req.getParameter("phone");
-            if (userDao.findByEmail(email)!=null) {
+            if (userDao.findByEmailExcept(email, user.getId())!=null) {
                 req.getSession().setAttribute("flash_error", "Email đã được sử dụng bởi tài khoản khác.");
                 resp.sendRedirect(req.getContextPath() + "/admin/user");
                 return;
             }
-            if (userDao.findByPhone(phone)!=null) {
+            if (userDao.findByPhoneExcept(phone, user.getId())!=null) {
                 req.getSession().setAttribute("flash_error", "Số điện thoại đã được sử dụng bởi tài khoản khác.");
                 resp.sendRedirect(req.getContextPath() + "/admin/user");
                 return;
             }
-            boolean isVerified = Boolean.parseBoolean(req.getParameter("isVerified"));
-            boolean isBlocked = Boolean.parseBoolean(req.getParameter("isBlocked"));
+            boolean isBlocked = Boolean.parseBoolean(req.getParameter("blocked"));
+            String address = req.getParameter("address");
             user.setEmail(email);
             user.setPhone(phone);
-            user.setVerified(isVerified);
             user.setBlocked(isBlocked);
+            user.setAddress(address);
             userDao.update(user);
             if (user.getRole() == Role.CUSTOMER){
                 CustomerDao customerDao = new CustomerDao();
                 String firstName = req.getParameter("firstName");
                 String lastName = req.getParameter("lastName");
-                Date dob = Date.valueOf(req.getParameter("dob"));
+                LocalDate dob = LocalDate.parse(req.getParameter("dob"));
                 Gender gender = Gender.valueOf(req.getParameter("gender"));
-                String address = req.getParameter("address");
                 Customer customer = customerDao.getById(user.getId());
                 customer.setFirstName(firstName);
                 customer.setLastName(lastName);
                 customer.setDateOfBirth(dob);
                 customer.setGender(gender);
-                customer.setAddress(address);
                 customerDao.update(customer);
             }
             if (user.getRole() == Role.RESTAURANT){
                 RestaurantDao restaurantDao = new RestaurantDao();
-                String address = req.getParameter("address");
+                String name = req.getParameter("name");
                 String mapEmbedUrl = req.getParameter("mapEmbedUrl");
                 LocalTime openTime = LocalTime.parse(req.getParameter("openTime"));
                 LocalTime closeTime = LocalTime.parse(req.getParameter("closeTime"));
                 Restaurant restaurant = restaurantDao.getById(user.getId());
                 restaurant.setUser(user);
-                restaurant.setAddress(address);
+                restaurant.setName(name);
                 restaurant.setMapEmbedUrl(mapEmbedUrl);
                 restaurant.setOpenTime(openTime);
                 restaurant.setCloseTime(closeTime);
@@ -373,6 +379,137 @@ public class UserController {
                 e.printStackTrace();
                 req.getSession().setAttribute("warning", "File tải lên phải là 1 ảnh");
             }
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+    @WebServlet("/google/oauth")
+    public static class GoogleOauthServlet extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow = new GoogleAuthorizationCodeFlow.Builder(
+                    new NetHttpTransport(),
+                    new JacksonFactory(),
+                    Config.google_oauth_client_id,
+                    Config.google_oauth_client_secret,
+                    Arrays.asList("openid", "profile", "email")
+            ).build();
+            String loginUrl = googleAuthorizationCodeFlow.newAuthorizationUrl()
+                    .setRedirectUri(new Config().google_oauth_redirect_uri)
+                    .build();
+            resp.sendRedirect(loginUrl);
+        }
+    }
+    @WebServlet("/login-google")
+    public static class LoginGoogle extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String authorizationCode = req.getParameter("code");
+            UserDao userDao = new UserDao();
+            GoogleTokenResponse googleTokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                    new NetHttpTransport(),
+                    new JacksonFactory(),
+                    "https://oauth2.googleapis.com/token",
+                    Config.google_oauth_client_id,
+                    Config.google_oauth_client_secret,
+                    authorizationCode,
+                    new Config().google_oauth_redirect_uri
+            ).execute();
+            GoogleIdToken googleIdToken = googleTokenResponse.parseIdToken();
+            GoogleIdToken.Payload payload = googleIdToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            String avatar = (String) payload.get("picture");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                user = new User();
+                user.setEmail(email);
+                user.setAvatar(avatar);
+                req.getSession().setAttribute("tempUser", user);
+                resp.sendRedirect(req.getContextPath() + "/add-more-info");
+            } else {
+                req.getSession().setAttribute("user", user);
+                resp.sendRedirect(req.getContextPath() + "/");
+            }
+        }
+    }
+    @WebServlet("/add-more-info")
+    public static class AddMoreInfoServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.getRequestDispatcher("/views/auth/add-more-info.jsp").forward(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            UserDao userDao = new UserDao();
+            User tempUser = (User) req.getSession().getAttribute("tempUser");
+            if (tempUser == null) {
+                req.getSession().setAttribute("flash_error", "Đã có lỗi xảy ra.");
+                resp.sendRedirect(req.getContextPath() + "/");
+                return;
+            }
+            String password = req.getParameter("password");
+            String confirmPassword = req.getParameter("confirmPassword");
+            String phone = req.getParameter("phone");
+            String address = req.getParameter("address");
+            tempUser.setPhone(phone);
+            tempUser.setAddress(address);
+            CustomerDao customerDao = new CustomerDao();
+            String firstName = req.getParameter("firstName");
+            String lastName = req.getParameter("lastName");
+            Gender gender = Gender.valueOf(req.getParameter("gender"));
+            LocalDate dateOfBirth = LocalDate.parse(req.getParameter("dateOfBirth"));
+            Customer customer = new Customer(tempUser, firstName, lastName, dateOfBirth, gender);
+            if (userDao.findByPhone(phone) != null) {
+                req.getSession().setAttribute("tempUser", tempUser);
+                req.getSession().setAttribute("tempCustomer", customer);
+                req.getSession().setAttribute("flash_error", "Số điện thoại đã được sử dụng");
+                resp.sendRedirect(req.getContextPath() + "/add-more-info");
+                return;
+            }
+            if (!confirmPassword.equals(password)) {
+                req.getSession().setAttribute("tempUser", tempUser);
+                req.getSession().setAttribute("tempCustomer", customer);
+                req.getSession().setAttribute("flash_error", "Mật khẩu không trùng khớp");
+                resp.sendRedirect(req.getContextPath() + "/add-more-info");
+                return;
+            }
+            tempUser.setVerified(true);
+            tempUser.setBlocked(false);
+            tempUser.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+            tempUser.setRole(Role.CUSTOMER);
+            userDao.save(tempUser);
+            customerDao.save(customer);
+            req.getSession().setAttribute("user", tempUser);
+            req.getSession().setAttribute("flash_success", "Đăng nhập thành công.");
+            resp.sendRedirect(req.getContextPath() + "/");
+        }
+    }
+    @WebServlet("/user/profile")
+    public static class UserProfile extends HttpServlet{
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String email = req.getParameter("email");
+            String phone = req.getParameter("phone");
+            String address = req.getParameter("address");
+            User user = (User) req.getSession().getAttribute("user");
+            UserDao userDao = new UserDao();
+            if (userDao.findByEmailExcept(email, user.getId()) != null) {
+                req.getSession().setAttribute("flash_error", "Email đã được sử dụng.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            if (userDao.findByPhoneExcept(phone, user.getId()) != null) {
+                req.getSession().setAttribute("flash_error", "Số điện thoại đã được sử dụng.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            user.setPhone(phone);
+            user.setAddress(address);
+            user.setEmail(email);
+            userDao.update(user);
+            req.getSession().setAttribute("user", user);
+            req.getSession().setAttribute("flash_success", "Cập nhật thành công.");
             resp.sendRedirect(req.getHeader("referer"));
         }
     }

@@ -5,10 +5,18 @@
              version="3.2">
     <persistence-unit name="angihomnay">
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://minh.database.windows.net:1433;database=angihomnay" />
+            <!-- dùng mysql -->
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://192.168.56.101:3306/angihomnay" />
+            <property name="jakarta.persistence.jdbc.user" value="root" />
+            <property name="jakarta.persistence.jdbc.password" value="root" />
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
+
+            <!-- dùng microsoft sql server -->
+            <!--<property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://minh.database.windows.net:1433;database=angihomnay" />
             <property name="jakarta.persistence.jdbc.user" value="free1year" />
             <property name="jakarta.persistence.jdbc.password" value="Minh1234@" />
-            <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+            <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />-->
+
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.show_sql" value="true" />
             <property name="hibernate.format_sql" value="false" />

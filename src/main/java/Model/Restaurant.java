@@ -21,7 +21,8 @@ public class Restaurant {
     @JoinColumn(name="id")
     private User user;
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
-    private String address;
+    private String name;
+    @Column(length = 1500)
     private String mapEmbedUrl;
     private LocalTime openTime;
     private LocalTime closeTime;
@@ -29,4 +30,12 @@ public class Restaurant {
     private List<RestaurantTable> restaurantTables;
     @OneToMany(mappedBy = "restaurant")
     private List<Food> foods;
+
+    public Restaurant(User user, String name, String mapEmbedUrl, LocalTime openTime, LocalTime closeTime) {
+        this.user = user;
+        this.name = name;
+        this.mapEmbedUrl = mapEmbedUrl;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+    }
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class GenericDao<T> {
@@ -26,6 +28,13 @@ public abstract class GenericDao<T> {
 
     public T getById(Long id) {
         return entityManager.find(entityClass, id);
+    }
+    public List<T> getByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return new ArrayList<>();
+        return entityManager.createQuery(
+                        "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e.id IN :ids", entityClass)
+                .setParameter("ids", ids)
+                .getResultList();
     }
 
     public void save(T entity) {

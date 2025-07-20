@@ -1,26 +1,24 @@
-<%-- 
-    Document   : forgot
-    Created on : Jun 16, 2025, 6:58:46 AM
-    Author     : Admin
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quên mật khẩu - AnGiHomNay</title>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/header.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/auth.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/animations.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <meta charset="UTF-8">
+        <%@include file="../common/head.jsp"%>
+        <link rel="stylesheet" href="<%= request.getContextPath()%>/assets/css/auth.css">
         <style>
             .success-message {
-                display: none;
                 text-align: center;
                 color: #2ecc71;
+                margin-top: 1rem;
+                padding: 1rem;
+                background-color: #f0fff4;
+                border-radius: 5px;
+            }
+
+            .error-message {
+                text-align: center;
+                color: #de0c0c;
                 margin-top: 1rem;
                 padding: 1rem;
                 background-color: #f0fff4;
@@ -72,50 +70,42 @@
         </header>
 
         <main class="auth-container">
-            <div class="auth-box fade-in">
+            <div class="auth-box auth-card">
                 <h2>Quên mật khẩu</h2>
                 <p style="text-align: center; color: #666; margin-bottom: 2rem;">
                     Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu
                 </p>
-                
-                <% String error = (String) request.getAttribute("error"); %>
-                <% if (error != null) {%>  
-                <div class="error-message slide-in-left"><%= error%></div>
-                <% }%>
-                
-                <% String success = (String) request.getAttribute("success"); %>
-                <% String tempPassword = (String) request.getAttribute("tempPassword"); %>
-                
-                <% if (success != null) {%>
-                <div class="success-message slide-in-left" style="display: block;">
-                    <i class="fas fa-check-circle heartbeat"></i>
-                    <p><%= success%></p>
-                    <% if (tempPassword != null) {%>
-                    <div class="temp-password pulse">
-                        <strong>Mật khẩu tạm thời: <%= tempPassword%></strong><br>
-                        <small>(Vui lòng đổi mật khẩu sau khi đăng nhập)</small>
-                    </div>
-                    <% }%>
-                </div>
-                <% } else { %>
-                
-                <form id="forgotPasswordForm" class="auth-form" method="post" action="${pageContext.request.contextPath}/forgot-password">
+                <form id="forgotPasswordForm" class="auth-form" action="<%=request.getContextPath()%>/forgot-password" method="post">
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-group">
                             <i class="fas fa-envelope"></i>
-                            <input type="email" id="email" name="email" required placeholder="Nhập email của bạn"
-                                   value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"
-                                   class="input-focus-animation">
+                            <input type="email" id="email" name="email" required placeholder="Nhập email của bạn">
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary btn-login-submit btn-hover-effect">Gửi yêu cầu</button>
+                    <button type="submit" class="btn-primary btn-login-submit">Gửi yêu cầu</button>
                 </form>
-                
+                <% if (request.getParameter("success")!=null) {%>
+                <% if (request.getParameter("success").equals("true")) {%>
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Chúng tôi đã gửi email hướng dẫn đặt lại mật khẩu đến địa chỉ email của bạn.</p>
+                    <p>Vui lòng kiểm tra hộp thư và làm theo hướng dẫn.</p>
+                </div>
+                <% } %>
+                <% if (request.getParameter("success").equals("false")) {%>
+                <div class="error-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Đã có lỗi xảy ra.</p>
+                    <p>Vui lòng liên hệ với quản trị viên.</p>
+                </div>
+                <% } %>
                 <% } %>
 
+
+
                 <div class="back-to-login">
-                    <a href="<%= request.getContextPath() %>/view/authen/login.jsp" class="btn-hover-effect">
+                    <a href="<%=request.getContextPath()%>/login">
                         <i class="fas fa-arrow-left"></i>
                         Quay lại đăng nhập
                     </a>
@@ -123,6 +113,8 @@
             </div>
         </main>
 
-        <script src="<%= request.getContextPath() %>/js/auth.js"></script>
+        <%@include file="../common/footer.jsp"%>
     </body>
+<%@include file="../common/foot.jsp"%>
+<%@include file="../common/js.jsp"%>
 </html> 

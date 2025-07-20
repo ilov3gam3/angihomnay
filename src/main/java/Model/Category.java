@@ -20,4 +20,8 @@ public class Category extends DistributedEntity {
     private String name;
     @ManyToMany(mappedBy = "categories")
     private List<Food> foods;
+
+    public Category(String name) {
+        this.name = name;
+    }
 }

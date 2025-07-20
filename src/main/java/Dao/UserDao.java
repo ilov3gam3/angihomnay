@@ -35,5 +35,4 @@ public class UserDao extends GenericDao<User> {
         query.setParameter("excludeId", excludeId);
         return query.getResultStream().findFirst().orElse(null);
     }
-
 }

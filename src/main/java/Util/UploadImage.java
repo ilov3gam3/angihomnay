@@ -50,14 +50,14 @@ public class UploadImage {
         }
 
         String newFileName = UploadImage.generateUniqueFileName(fileName);
-        String uploadDir = req.getServletContext().getRealPath("/") + "uploads";
+        String uploadDir = req.getServletContext().getRealPath("/") + "assets/uploads";
         Path filePath = Paths.get(uploadDir, newFileName);
 
         try (InputStream fileContent = filePart.getInputStream()) {
             Files.copy(fileContent, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        newFileName = "uploads/" + newFileName;
+        newFileName = "/assets/uploads/" + newFileName;
         return newFileName;
     }
     public static String readFile(String filePath) {

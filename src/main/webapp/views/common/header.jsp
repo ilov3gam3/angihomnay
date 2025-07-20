@@ -77,13 +77,12 @@
         </div>
         <nav class="main-nav">
             <ul>
-                <li><a href="<%= request.getContextPath()%>/">Trang chủ</a></li>
                 <% if (user != null && user.getRole() == Role.ADMIN) { %>
                 <li><a href="<%= request.getContextPath()%>/admin/user">Quản lý người dùng</a></li>
-                <li><a href="<%= request.getContextPath()%>/admin/categories">Quản lý loại </a></li>
-                <li><a href="<%= request.getContextPath()%>/admin">Quản lý người dùng</a></li>
-                <li><a href="<%= request.getContextPath()%>/admin">Quản lý người dùng</a></li>
-                <li><a href="<%= request.getContextPath()%>/admin">Quản lý người dùng</a></li>
+                <li><a href="<%= request.getContextPath()%>/admin/categories">Quản lý loại món ăn</a></li>
+                <% } else if (user != null && user.getRole() == Role.RESTAURANT){ %>
+                <li><a href="<%= request.getContextPath()%>/restaurant/foods">Quản lý món ăn</a></li>
+                <li><a href="<%= request.getContextPath()%>/restaurant/tables">Quản lý bàn</a></li>
                 <% } else { %>
                 <li><a href="<%= request.getContextPath()%>/">Trang chủ</a></li>
                 <li><a href="<%= request.getContextPath()%>/view/random.jsp">Quay món</a></li>
@@ -94,26 +93,28 @@
                 <% } %>
             </ul>
         </nav>
-        <div class="user-actions">
+        <div style="width: 300px" class="user-actions">
             <% if (user == null) { %>
             <a href="<%= request.getContextPath()%>/login" class="btn-login">Đăng nhập</a>
             <a href="<%= request.getContextPath()%>/register" class="btn-register">Đăng ký</a>
             <% } else { %>
             <div class="user-dropdown" id="userDropdownWrap">
-                <p><%=user.getEmail()%>
-                </p>
-                <img src="<%= request.getContextPath()%><%=user.getAvatar()%>" alt="User" class="avatar-icon"
-                     id="avatarIcon">
+                <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-start;">
+                    <p style="margin: 0;"><%= user.getEmail() %></p>
+                    <img src="<%= user.getAvatar() %>" alt="User" class="avatar-icon" id="avatarIcon">
+                </div>
                 <ul class="dropdown-menu" id="userDropdown">
                     <% if (user.getRole() != Role.ADMIN) {%>
                     <li>
                         <a href="<%= request.getContextPath()%>/<%=user.getRole() == Role.CUSTOMER ? "customer" : "restaurant"%>/profile"><i
                                 class="fas fa-user"></i> Trang cá nhân</a></li>
                     <% } %>
-                    <li><a href="<%= request.getContextPath()%>/settings.jsp"><i class="fas fa-cog"></i> Cài đặt</a>
+                    <li>
+                        <a href="<%= request.getContextPath()%>/settings.jsp"><i class="fas fa-cog"></i> Cài đặt</a>
                     </li>
-                    <li><a href="<%= request.getContextPath()%>/logout"><i class="fas fa-sign-out-alt"></i> Đăng
-                        xuất</a></li>
+                    <li>
+                        <a href="<%= request.getContextPath()%>/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </li>
                 </ul>
             </div>
             <% } %>

@@ -17,7 +17,7 @@ public class CategoryController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             CategoryDao categoryDao = new CategoryDao();
-            List<Category> categories = categoryDao.getAll();
+            List<Category> categories = categoryDao.getAllWithFoods();
             req.setAttribute("categories", categories);
             req.getRequestDispatcher("/views/admin/category.jsp").forward(req, resp);
         }
