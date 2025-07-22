@@ -26,6 +26,8 @@
                 <th>Giá</th>
                 <th>Ảnh</th>
                 <th>Danh mục</th>
+                <th>Khẩu vị</th>
+                <th>Dị ứng</th>
                 <th>Khả dụng</th>
                 <th>Thao tác</th>
             </tr>
@@ -48,6 +50,20 @@
                     </ul>
                 </td>
                 <td>
+                    <ul>
+                        <% for (Taste t : food.getTastes()) { %>
+                        <li><%= t.getName() %></li>
+                        <% } %>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <% for (AllergyType a : food.getAllergyContents()) { %>
+                        <li><%= a.getName() %></li>
+                        <% } %>
+                    </ul>
+                </td>
+                <td>
                     <%=food.isAvailable() ? "Có": "Không"%>
                 </td>
                 <td>
@@ -61,7 +77,9 @@
                             data-description="<%= food.getDescription() %>"
                             data-price="<%= food.getPrice() %>"
                             data-available="<%= food.isAvailable() %>"
-                            data-categories="<%= food.getCategories().stream().map(c -> c.getId().toString()).collect(java.util.stream.Collectors.joining(",")) %>">
+                            data-categories="<%= food.getCategories().stream().map(c -> c.getId().toString()).collect(java.util.stream.Collectors.joining(",")) %>"
+                            data-tastes="<%= food.getTastes().stream().map(t -> t.getId().toString()).collect(java.util.stream.Collectors.joining(",")) %>"
+                            data-allergies="<%= food.getAllergyContents().stream().map(a -> a.getId().toString()).collect(java.util.stream.Collectors.joining(",")) %>">
                         Sửa
                     </button>
                 </td>
@@ -113,6 +131,27 @@
                             <% } %>
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label for="tasteIds">Khẩu vị</label>
+                        <select class="form-control js-example-basic-multiple" id="tasteIds" name="tasteIds" multiple="multiple">
+                            <% List<Taste> tastes = (List<Taste>) request.getAttribute("tastes"); %>
+                            <% for (Taste taste : tastes) { %>
+                            <option value="<%= taste.getId() %>"><%= taste.getName() %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="allergyIds">Thành phần dị ứng</label>
+                        <select class="form-control js-example-basic-multiple" id="allergyIds" name="allergyIds" multiple="multiple">
+                            <% List<AllergyType> allergies = (List<AllergyType>) request.getAttribute("allergies"); %>
+                            <% for (AllergyType allergy : allergies) { %>
+                            <option value="<%= allergy.getId() %>"><%= allergy.getName() %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Thêm món ăn</button>
@@ -170,6 +209,25 @@
                             <% } %>
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label for="edit_tasteIds">Khẩu vị</label>
+                        <select class="form-control js-example-basic-multiple" id="edit_tasteIds" name="tasteIds" multiple="multiple">
+                            <% for (Taste taste : tastes) { %>
+                            <option value="<%= taste.getId() %>"><%= taste.getName() %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_allergyIds">Thành phần dị ứng</label>
+                        <select class="form-control js-example-basic-multiple" id="edit_allergyIds" name="allergyIds" multiple="multiple">
+                            <% for (AllergyType allergy : allergies) { %>
+                            <option value="<%= allergy.getId() %>"><%= allergy.getName() %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Cập nhật món</button>
@@ -197,6 +255,14 @@
         const price = button.dataset.price;
         const available = button.dataset.available;
         const categoryIds = button.dataset.categories ? button.dataset.categories.split(",") : [];
+        const tasteIds = button.dataset.tastes ? button.dataset.tastes.split(",") : [];
+        const allergyIds = button.dataset.allergies ? button.dataset.allergies.split(",") : [];
+
+        $('#edit_tasteIds').val(null).trigger('change');
+        $('#edit_tasteIds').val(tasteIds).trigger('change');
+
+        $('#edit_allergyIds').val(null).trigger('change');
+        $('#edit_allergyIds').val(allergyIds).trigger('change');
 
         $('#edit_id').val(id);
         $('#edit_name').val(name);

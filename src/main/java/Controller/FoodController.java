@@ -3,6 +3,11 @@ package Controller;
 import Dao.CategoryDao;
 import Dao.FoodDao;
 import Dao.RestaurantDao;
+import Dao.TasteDao;
+import Dao.AllergyTypeDao;
+import Model.Taste;
+import Model.AllergyType;
+
 import Model.Category;
 import Model.Food;
 import Model.Restaurant;
@@ -28,11 +33,19 @@ public class FoodController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             CategoryDao categoryDao = new CategoryDao();
             FoodDao foodDao = new FoodDao();
-            List<Category> categories = categoryDao.getAll().reversed();
+            TasteDao tasteDao = new TasteDao();
+            AllergyTypeDao allergyDao = new AllergyTypeDao();
+
+            List<Category> categories = categoryDao.getAll();
             RestaurantDao restaurantDao = new RestaurantDao();
             User user = (User) req.getSession().getAttribute("user");
             Restaurant restaurant = restaurantDao.getById(user.getId());
             List<Food> foods = foodDao.getFoodsOfRestaurant(restaurant).reversed();
+            List<Taste> tastes = tasteDao.getAll();
+            List<AllergyType> allergies = allergyDao.getAll();
+
+            req.setAttribute("tastes", tastes);
+            req.setAttribute("allergies", allergies);
             req.setAttribute("foods", foods);
             req.setAttribute("categories", categories);
             req.getRequestDispatcher("/views/restaurant/food.jsp").forward(req, resp);
@@ -51,9 +64,18 @@ public class FoodController {
                     .map(Long::parseLong)
                     .toList();
             List<Category> categories = categoryDao.getByIds(categoryIds);
+            List<Long> tasteIds = Optional.ofNullable(req.getParameterValues("tasteIds"))
+                    .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
+            List<Taste> tastes = new TasteDao().getByIds(tasteIds);
+
+            List<Long> allergyIds = Optional.ofNullable(req.getParameterValues("allergyIds"))
+                    .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
+            List<AllergyType> allergies = new AllergyTypeDao().getByIds(allergyIds);
             User user = (User) req.getSession().getAttribute("user");
             Restaurant restaurant = restaurantDao.getById(user.getId());
             Food food = new Food(name, description, price, image, categories, restaurant, true);
+            food.setTastes(tastes);
+            food.setAllergyContents(allergies);
             foodDao.save(food);
             req.getSession().setAttribute("flash_success", "Thêm món ăn thành công.");
             resp.sendRedirect(req.getContextPath() + "/restaurant/foods");
@@ -67,6 +89,7 @@ public class FoodController {
             RestaurantDao restaurantDao = new RestaurantDao();
             FoodDao foodDao = new FoodDao();
             CategoryDao categoryDao = new CategoryDao();
+
             User user = (User) req.getSession().getAttribute("user");
             Restaurant restaurant = restaurantDao.getById(user.getId());
             long id = Long.parseLong(req.getParameter("id"));
@@ -87,14 +110,65 @@ public class FoodController {
             if (req.getPart("image") != null && req.getPart("image").getSize() > 0) {
                 food.setImage(UploadImage.saveImage(req, "image"));
             }
+
+            List<Long> tasteIds = Optional.ofNullable(req.getParameterValues("tasteIds"))
+                    .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
+            List<Taste> tastes = new TasteDao().getByIds(tasteIds);
+
+            List<Long> allergyIds = Optional.ofNullable(req.getParameterValues("allergyIds"))
+                    .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
+            List<AllergyType> allergies = new AllergyTypeDao().getByIds(allergyIds);
+
             food.setName(name);
             food.setDescription(description);
             food.setPrice(price);
             food.setCategories(categories);
             food.setAvailable(isAvailable);
+            food.setTastes(tastes);
+            food.setAllergyContents(allergies);
             foodDao.update(food);
             req.getSession().setAttribute("flash_success", "Cập nhật thành công.");
             resp.sendRedirect(req.getContextPath() + "/restaurant/foods");
+        }
+    }
+
+    @WebServlet("/search")
+    public static class SearchFoodServlet extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+            boolean hasParams = req.getParameterMap().keySet().stream()
+                    .anyMatch(key -> req.getParameter(key) != null && !req.getParameter(key).trim().isEmpty());
+
+            if (!hasParams) {
+                req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
+                return;
+            }
+            FoodDao foodDao = new FoodDao();
+            String searchString = req.getParameter("searchString");
+            String[] categoryIds = req.getParameterValues("categories");
+            String[] allergyIds = req.getParameterValues("allergyContents");
+            String[] tasteIds = req.getParameterValues("tastes");
+
+            Double priceFrom = parseDouble(req.getParameter("priceFrom"));
+            Double priceTo = parseDouble(req.getParameter("priceTo"));
+
+            List<Food> result = foodDao.searchFoods(searchString, priceFrom, priceTo, categoryIds, allergyIds, tasteIds);
+            for (int i = 0; i < result.size(); i++) {
+                System.out.println(result.get(i).getId());
+                System.out.println(result.get(i).getCategories());
+                System.out.println(result.get(i).getAllergyContents());
+                System.out.println(result.get(i).getTastes());
+            }
+            req.setAttribute("foodList", result);
+            req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
+        }
+        private Double parseDouble(String s) {
+            try {
+                return (s != null && !s.trim().isEmpty()) ? Double.parseDouble(s) : null;
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
     }
 }

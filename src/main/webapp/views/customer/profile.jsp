@@ -1,7 +1,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="Model.Customer"%>
-<%@page import="Model.User"%>
 <%@page import="Model.Constant.Gender"%>
+<%@ page import="java.util.List" %>
+<%@ page import="Dao.TasteDao" %>
+<%@ page import="java.util.Objects" %>
 <%
     Customer customer = (Customer) request.getAttribute("customer");
 %>
@@ -122,6 +124,29 @@
         <button type="submit" class="btn btn-warning">Cập nhật thông tin</button>
     </form>
 
+    <hr class="my-5">
+    <h3>Cập nhật khẩu vị của bạn</h3>
+    <form action="<%=request.getContextPath()%>/customer/tastes" method="post">
+        <div class="form-group mb-3">
+            <label for="tastes">khẩu vị của bạn</label>
+            <select name="tastes" id="tastes" class="form-control select-tastes" multiple>
+                <% List<Taste> tastes =  new TasteDao().getAll(); %>
+                <% for (int i = 0; i < tastes.size(); i++) { %>
+                <%
+                    List<Taste> userTastes = user.getFavoriteTastes();
+                    boolean check = false;
+                    for (int j = 0; j < userTastes.size(); j++) {
+                        if (Objects.equals(tastes.get(i).getId(), userTastes.get(j).getId())){
+                            check = true;
+                        }
+                    }
+                %>
+                <option value="<%=tastes.get(i).getId()%>" <%= check ? "selected" : "" %>><%=tastes.get(i).getName()%></option>
+                <% } %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-warning">Cập nhật thông tin</button>
+    </form>
 
 </main>
 
@@ -130,6 +155,12 @@
 <%@include file="../common/foot.jsp"%>
 <%@include file="../common/js.jsp"%>
 <script>
+    $(document).ready(function () {
+        $('.select-tastes').select2({
+            placeholder: "Chọn danh mục cho món ăn",
+            width: '100%'
+        });
+    });
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.querySelector('form[action$="change-password"]');
         if (form) {

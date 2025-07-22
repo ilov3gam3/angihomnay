@@ -37,26 +37,19 @@
             <!-- Search Bar -->
             <div class="search-bar">
                 <div class="search-wrapper">
-                    <div class="search-input">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Tìm kiếm món ăn, nhà hàng...">
-                    </div>
-                    <div class="search-filters">
-                        <select class="filter-select">
-                            <option value="">Loại món</option>
-                            <option value="vietnamese">Món Việt</option>
-                            <option value="international">Món Quốc tế</option>
-                            <option value="dessert">Tráng miệng</option>
-                            <option value="drinks">Đồ uống</option>
-                        </select>
-                        <select class="filter-select">
-                            <option value="">Khu vực</option>
-                            <option value="hanoi">Hà Nội</option>
-                            <option value="hcm">TP. Hồ Chí Minh</option>
-                            <option value="danang">Đà Nẵng</option>
-                        </select>
-                    </div>
-                    <button class="search-btn">Tìm kiếm</button>
+                    <form style="width: 100%" action="<%=request.getContextPath()%>/search" method="get">
+                        <div class="row">
+                            <div class="col-10">
+                                <div class="search-input">
+                                    <i class="fas fa-search"></i>
+                                    <input class="form-control" type="text" placeholder="Tìm kiếm món ăn, nhà hàng...">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <button class="search-btn">Tìm kiếm</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 

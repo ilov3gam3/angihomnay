@@ -1,11 +1,13 @@
 package Controller;
 
 import Dao.CustomerDao;
+import Dao.RememberMeTokenDao;
 import Dao.RestaurantDao;
 import Dao.UserDao;
 import Model.Constant.Gender;
 import Model.Constant.Role;
 import Model.Customer;
+import Model.RememberMeToken;
 import Model.Restaurant;
 import Model.User;
 import Util.Config;
@@ -14,6 +16,7 @@ import Util.UploadImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +31,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +74,21 @@ public class UserController {
             }
             req.getSession().setAttribute("user", user);
             req.getSession().setAttribute("flash_success", "Đăng nhập thành công.");
+
+            if ("on".equals(req.getParameter("remember"))) {
+                String token = java.util.UUID.randomUUID().toString();
+                LocalDateTime expiry = LocalDateTime.now().plusDays(30);
+
+                RememberMeTokenDao tokenDao = new RememberMeTokenDao();
+                tokenDao.save(new RememberMeToken(token, expiry, user));
+
+                Cookie cookie = new Cookie("remember_token", token);
+                cookie.setHttpOnly(true);
+                cookie.setMaxAge(30 * 24 * 60 * 60);
+                cookie.setPath(req.getContextPath());
+                resp.addCookie(cookie);
+            }
+
             resp.sendRedirect(req.getContextPath() + "/");
         }
     }
@@ -151,8 +170,14 @@ public class UserController {
     public static class LogoutServlet extends HttpServlet {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            User user = (User) req.getSession().getAttribute("user");
+            new RememberMeTokenDao().deleteByUser(user);
+            Cookie cookie = new Cookie("remember_token", "");
+            cookie.setMaxAge(0);
+            cookie.setPath(req.getContextPath());
+            resp.addCookie(cookie);
             req.getSession().invalidate();
-            resp.sendRedirect(req.getContextPath() + "/");
+            resp.sendRedirect(req.getContextPath() + "/login");
         }
     }
     @WebServlet("/forgot-password")

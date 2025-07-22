@@ -7,7 +7,6 @@ import jakarta.persistence.Persistence;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class GenericDao<T> {

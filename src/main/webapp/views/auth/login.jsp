@@ -41,7 +41,7 @@
 
             <div class="remember-forgot">
                 <div class="remember-me">
-                    <input type="checkbox" id="remember" name="remember">
+                    <input type="checkbox" id="remember" name="remember" value="on">
                     <label for="remember">Ghi nhớ đăng nhập</label>
                 </div>
                 <a href="<%= request.getContextPath()%>/forgot-password" class="forgot-password">Quên mật khẩu?</a>
