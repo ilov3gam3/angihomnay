@@ -5,6 +5,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class FoodDao extends GenericDao<Food> {
@@ -38,28 +39,37 @@ public class FoodDao extends GenericDao<Food> {
         query.setParameter("foodId", foodId);
         return query.getResultStream().findFirst().orElse(null);
     }
-
-    public List<Food> searchFoods(String keyword, Double priceFrom, Double priceTo, String[] categoryIds, String[] allergyIds, String[] tasteIds) {
+    public List<Food> searchFoods(String keyword, Double priceFrom, Double priceTo,
+                                  String[] categoryIds, String[] allergyIds, String[] tasteIds) {
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<Food> cq = cb.createQuery(Food.class);
             Root<Food> foodRoot = cq.from(Food.class);
-//            foodRoot.fetch("categories", JoinType.LEFT);
-//            foodRoot.fetch("allergyContents", JoinType.LEFT);
-//            foodRoot.fetch("tastes", JoinType.LEFT);
+
+            // Fetch liên quan (phải khớp kiểu join bên dưới)
+            foodRoot.fetch("categories", JoinType.LEFT);
+            foodRoot.fetch("allergyContents", JoinType.LEFT);
+            foodRoot.fetch("tastes", JoinType.LEFT);
             cq.select(foodRoot).distinct(true);
+
+            // Tạo các join riêng để lọc
+            Join<Food, Category> categoryJoin = foodRoot.join("categories", JoinType.LEFT);
+            Join<Food, AllergyType> allergyJoin = foodRoot.join("allergyContents", JoinType.LEFT);
+            Join<Food, Taste> tasteJoin = foodRoot.join("tastes", JoinType.LEFT);
 
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(foodRoot.get("isAvailable"), true));
-            // Tìm theo từ khóa
+
+            // Keyword
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String pattern = "%" + keyword.trim().toLowerCase() + "%";
-                Predicate nameLike = cb.like(cb.lower(foodRoot.get("name")), pattern);
-                Predicate descLike = cb.like(cb.lower(foodRoot.get("description")), pattern);
-                predicates.add(cb.or(nameLike, descLike));
+                predicates.add(cb.or(
+                        cb.like(cb.lower(foodRoot.get("name")), pattern),
+                        cb.like(cb.lower(foodRoot.get("description")), pattern)
+                ));
             }
 
-            // Giá từ / đến
+            // Price range
             if (priceFrom != null) {
                 predicates.add(cb.greaterThanOrEqualTo(foodRoot.get("price"), priceFrom));
             }
@@ -67,29 +77,35 @@ public class FoodDao extends GenericDao<Food> {
                 predicates.add(cb.lessThanOrEqualTo(foodRoot.get("price"), priceTo));
             }
 
-            // Danh mục
+            // Category filter
             if (categoryIds != null && categoryIds.length > 0) {
-                Join<Food, Category> catJoin = foodRoot.join("categories");
-                predicates.add(catJoin.get("id").in((Object[]) categoryIds));
+                predicates.add(categoryJoin.get("id").in((Object[]) categoryIds));
             }
 
-            // Dị ứng
+            // Allergy filter
             if (allergyIds != null && allergyIds.length > 0) {
-                Join<Food, AllergyType> allergyJoin = foodRoot.join("allergyContents");
                 predicates.add(allergyJoin.get("id").in((Object[]) allergyIds));
             }
 
-            // Hương vị
+            // Taste filter
             if (tasteIds != null && tasteIds.length > 0) {
-                Join<Food, Taste> tasteJoin = foodRoot.join("tastes");
                 predicates.add(tasteJoin.get("id").in((Object[]) tasteIds));
             }
 
             cq.where(cb.and(predicates.toArray(new Predicate[0])));
-            List<Food> foods = entityManager.createQuery(cq).getResultList();
-            return entityManager.createQuery(cq).getResultList();
+
+            List<Food> result = entityManager.createQuery(cq).getResultList();
+
+            // Optional: ép Set nếu cần tránh lazy load sau khi session đóng
+            for (Food food : result) {
+                food.setCategories(new HashSet<>(food.getCategories()));
+                food.setAllergyContents(new HashSet<>(food.getAllergyContents()));
+                food.setTastes(new HashSet<>(food.getTastes()));
+            }
+
+            return result;
         } finally {
-            entityManager.close();
+            entityManager.close(); // Đóng session sau khi data đã được fetch
         }
     }
 }

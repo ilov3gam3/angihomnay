@@ -15,9 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class CustomerController {
     @WebServlet("/customer/profile")
@@ -60,7 +58,7 @@ public class CustomerController {
             List<Long> tastesIds = Optional.ofNullable(req.getParameterValues("tastesIds")).stream().flatMap(Arrays::stream)
                     .map(Long::parseLong)
                     .toList();
-            List<Taste> tastes = tasteDao.getByIds(tastesIds);
+            Set<Taste> tastes = new HashSet<>(tasteDao.getByIds(tastesIds));
             user.setFavoriteTastes(tastes);
             userDao.update(user);
             req.getSession().setAttribute("user", user);

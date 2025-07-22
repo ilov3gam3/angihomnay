@@ -11,10 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @WebListener
 public class StartListener implements ServletContextListener {
@@ -77,13 +74,13 @@ public class StartListener implements ServletContextListener {
         List<User> users;
         List<Restaurant> restaurants;
         if (userDao.getAll().isEmpty()) {
-            User admin1 = new User("admin1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456789", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.ADMIN);
-            User admin2 = new User("admin2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456788", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.ADMIN);
-            User user1 = new User("user1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456787", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.CUSTOMER);
-            User user2 = new User("user2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456786", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.CUSTOMER);
-            User user3 = new User("user3@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456785", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.CUSTOMER);
-            User res1 = new User("res1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456784", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.RESTAURANT);
-            User res2 = new User("res2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456783", "da nang viet nam", null, getRandomSubset(allergyTypes), getRandomSubset(tastes), true, false, Role.RESTAURANT);
+            User admin1 = new User("admin1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456789", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.ADMIN);
+            User admin2 = new User("admin2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456788", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.ADMIN);
+            User user1 = new User("user1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456787", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.CUSTOMER);
+            User user2 = new User("user2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456786", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.CUSTOMER);
+            User user3 = new User("user3@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456785", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.CUSTOMER);
+            User res1 = new User("res1@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456784", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.RESTAURANT);
+            User res2 = new User("res2@gmail.com", BCrypt.hashpw("123456", BCrypt.gensalt()), "/assets/img/default-avatar.jpg", "0123456783", "da nang viet nam", null, getRandomSubset(allergyTypes), new HashSet<>(getRandomSubset(tastes)), true, false, Role.RESTAURANT);
             users = List.of(admin1, admin2, user1, user2, user3, res1, res2);
             userDao.saveAll(users);
             Customer customer1 = new Customer(user1, "Trần", "A", LocalDate.parse("2002-05-08"), Gender.MALE);

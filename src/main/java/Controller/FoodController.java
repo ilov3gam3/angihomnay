@@ -21,9 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class FoodController {
     @WebServlet("/restaurant/foods")
@@ -63,14 +61,14 @@ public class FoodController {
             List<Long> categoryIds = Optional.ofNullable(req.getParameterValues("categoryIds")).stream().flatMap(Arrays::stream)
                     .map(Long::parseLong)
                     .toList();
-            List<Category> categories = categoryDao.getByIds(categoryIds);
+            Set<Category> categories = new HashSet<>(categoryDao.getByIds(categoryIds));
             List<Long> tasteIds = Optional.ofNullable(req.getParameterValues("tasteIds"))
                     .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
-            List<Taste> tastes = new TasteDao().getByIds(tasteIds);
+            Set<Taste> tastes = new HashSet<>(new TasteDao().getByIds(tasteIds));
 
             List<Long> allergyIds = Optional.ofNullable(req.getParameterValues("allergyIds"))
                     .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
-            List<AllergyType> allergies = new AllergyTypeDao().getByIds(allergyIds);
+            Set<AllergyType> allergies = new HashSet<>(new AllergyTypeDao().getByIds(allergyIds));
             User user = (User) req.getSession().getAttribute("user");
             Restaurant restaurant = restaurantDao.getById(user.getId());
             Food food = new Food(name, description, price, image, categories, restaurant, true);
@@ -105,7 +103,7 @@ public class FoodController {
             List<Long> categoryIds = Optional.ofNullable(req.getParameterValues("categoryIds")).stream().flatMap(Arrays::stream)
                     .map(Long::parseLong)
                     .toList();
-            List<Category> categories = categoryDao.getByIds(categoryIds);
+            Set<Category> categories = new HashSet<>(categoryDao.getByIds(categoryIds));
             boolean isAvailable = Boolean.parseBoolean(req.getParameter("available"));
             if (req.getPart("image") != null && req.getPart("image").getSize() > 0) {
                 food.setImage(UploadImage.saveImage(req, "image"));
@@ -113,11 +111,11 @@ public class FoodController {
 
             List<Long> tasteIds = Optional.ofNullable(req.getParameterValues("tasteIds"))
                     .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
-            List<Taste> tastes = new TasteDao().getByIds(tasteIds);
+            Set<Taste> tastes = new HashSet<>(new TasteDao().getByIds(tasteIds));
 
             List<Long> allergyIds = Optional.ofNullable(req.getParameterValues("allergyIds"))
                     .stream().flatMap(Arrays::stream).map(Long::parseLong).toList();
-            List<AllergyType> allergies = new AllergyTypeDao().getByIds(allergyIds);
+            Set<AllergyType> allergies = new HashSet<>(new AllergyTypeDao().getByIds(allergyIds));
 
             food.setName(name);
             food.setDescription(description);
@@ -154,12 +152,14 @@ public class FoodController {
             Double priceTo = parseDouble(req.getParameter("priceTo"));
 
             List<Food> result = foodDao.searchFoods(searchString, priceFrom, priceTo, categoryIds, allergyIds, tasteIds);
-            for (int i = 0; i < result.size(); i++) {
-                System.out.println(result.get(i).getId());
-                System.out.println(result.get(i).getCategories());
-                System.out.println(result.get(i).getAllergyContents());
-                System.out.println(result.get(i).getTastes());
-            }
+//            System.out.println("debug in servlet");
+//            for (int i = 0; i < result.size(); i++) {
+//                System.out.println(result.get(i).getId());
+//                System.out.println(result.get(i).getCategories());
+//                System.out.println(result.get(i).getAllergyContents());
+//                System.out.println(result.get(i).getTastes());
+//            }
+//            System.out.println("debug in servlet");
             req.setAttribute("foodList", result);
             req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
         }

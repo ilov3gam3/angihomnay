@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,7 +38,7 @@ public class User extends DistributedEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "taste_id")
     )
-    private List<Taste> favoriteTastes;
+    private Set<Taste> favoriteTastes;
     private boolean isVerified;
     private boolean isBlocked;
     @Enumerated(EnumType.STRING)

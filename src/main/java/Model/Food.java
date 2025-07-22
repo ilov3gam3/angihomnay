@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,35 +23,32 @@ public class Food extends DistributedEntity {
     private double price;
     private String image;
     @ManyToMany(fetch = FetchType.LAZY)
-    @BatchSize(size = 10)
     @JoinTable(
             name="categories_food",
             joinColumns = @JoinColumn(name = "food_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> categories;
+    private Set<Category> categories;
     @ManyToMany(fetch = FetchType.LAZY)
-    @BatchSize(size = 10)
     @JoinTable(
             name = "food_allergy",
             joinColumns = @JoinColumn(name = "food_id"),
             inverseJoinColumns = @JoinColumn(name = "allergy_id")
     )
-    private List<AllergyType> allergyContents;
+    private Set<AllergyType> allergyContents;
     @ManyToMany(fetch = FetchType.LAZY)
-    @BatchSize(size = 10)
     @JoinTable(
             name = "food_taste",
             joinColumns = @JoinColumn(name = "food_id"),
             inverseJoinColumns = @JoinColumn(name = "taste_id")
     )
-    private List<Taste> tastes;
+    private Set<Taste> tastes;
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
     private boolean isAvailable;
 
-    public Food(String name, String description, double price, String image, List<Category> categories, Restaurant restaurant, boolean isAvailable) {
+    public Food(String name, String description, double price, String image, Set<Category> categories, Restaurant restaurant, boolean isAvailable) {
         this.name = name;
         this.description = description;
         this.price = price;

@@ -3,14 +3,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+###source code###
+./src/main/resources/META-INF/persistence.xml
+./src/main/java/Util/Config.java
+
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
+.idea
 
 ### Eclipse ###
 .apt_generated
