@@ -133,7 +133,7 @@
                 <% List<Taste> tastes =  new TasteDao().getAll(); %>
                 <% for (int i = 0; i < tastes.size(); i++) { %>
                 <%
-                    List<Taste> userTastes = user.getFavoriteTastes();
+                    List<Taste> userTastes = user.getFavoriteTastes().stream().toList();
                     boolean check = false;
                     for (int j = 0; j < userTastes.size(); j++) {
                         if (Objects.equals(tastes.get(i).getId(), userTastes.get(j).getId())){

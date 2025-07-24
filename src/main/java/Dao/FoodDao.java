@@ -108,4 +108,8 @@ public class FoodDao extends GenericDao<Food> {
             entityManager.close(); // Đóng session sau khi data đã được fetch
         }
     }
+    public List<Food> getAvailableByIds(List<Long> ids){
+        TypedQuery<Food> query = entityManager.createQuery("select f from Food f where f.id in (:ids) and f.isAvailable = true ", Food.class);
+        return query.setParameter("ids", ids).getResultList();
+    }
 }
