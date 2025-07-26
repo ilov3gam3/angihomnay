@@ -4,6 +4,7 @@ import Model.Restaurant;
 import Model.RestaurantTable;
 import jakarta.persistence.TypedQuery;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,5 +22,15 @@ public class RestaurantTableDao extends GenericDao<RestaurantTable> {
                 .setParameter("restaurant", restaurant)
                 .getSingleResult();
         return count > 0;
+    }
+    public RestaurantTable findAvailableTable(long restaurantId, LocalDateTime startTime, LocalDateTime endTime) {
+        TypedQuery<RestaurantTable> query = entityManager.createQuery("select rt from RestaurantTable  rt where rt.restaurant.id = :restaurantId and rt.id not in (select b.table.id from Booking b where b.status != 'CANCELLED' and b.startTime <: endTime and b.endTime > :startTime)", RestaurantTable.class);
+        List<RestaurantTable> results = query
+                .setParameter("restaurantId", restaurantId)
+                .setParameter("startTime", startTime)
+                .setParameter("endTime", endTime)
+                .setMaxResults(1)
+                .getResultList();
+        return results.isEmpty() ? null : results.getFirst();
     }
 }

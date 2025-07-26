@@ -17,5 +17,12 @@ public class BookingDetail extends DistributedEntity {
     private Booking booking;
     @ManyToOne
     private Food food;
+    private double price;
     private int quantity;
+
+    public BookingDetail(Food food, double price, int quantity) {
+        this.food = food;
+        this.price = price;
+        this.quantity = quantity;
+    }
 }

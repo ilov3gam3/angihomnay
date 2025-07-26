@@ -5,6 +5,7 @@ import Model.Constant.BookingStatus;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class BookingDao extends GenericDao<Booking>{
@@ -32,4 +33,5 @@ public class BookingDao extends GenericDao<Booking>{
                 .setParameter("id", id)
                 .getSingleResult();
     }
+
 }

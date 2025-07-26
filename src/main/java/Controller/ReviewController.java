@@ -30,7 +30,6 @@ public class ReviewController {
 
                 BookingDao bookingDao = new BookingDao();
                 ReviewDao reviewDao = new ReviewDao();
-                ReviewDetailDao reviewDetailDao = new ReviewDetailDao();
 
                 // Lấy Booking cùng với BookingDetails
                 Booking booking = bookingDao.getByIdWithDetails(bookingId);

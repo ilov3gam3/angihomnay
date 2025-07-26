@@ -6,6 +6,7 @@ import Dao.PaymentDao;
 import Model.Booking;
 import Model.BookingDetail;
 import Model.Constant.BookingStatus;
+import Model.Constant.PaymentType;
 import Model.Constant.TransactionStatus;
 import Model.Payment;
 import Util.Config;
@@ -95,18 +96,27 @@ public class PaymentController {
             payment.setAmount(amount/100);
             payment.setTxnRef(vnp_TxnRef);
             payment.setOrderInfo(vnp_OrderInfo);
+            if (booking.getAmount() == 0 && booking.getPrePaidFee() != 0){
+                payment.setType(PaymentType.DEPOSIT);
+            } else {
+                payment.setType(PaymentType.FINAL);
+            }
             new PaymentDao().save(payment);
             String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
             resp.sendRedirect(paymentUrl);
         }
         public static long getAmount(Booking booking){
-            long amount = 0;
-            BookingDetailDao bookingDetailDao = new BookingDetailDao();
-            List<BookingDetail> bookingDetails = bookingDetailDao.getBookingDetailsByBookingIdAndFoods(booking.getId());
-            for (BookingDetail bookingDetail : bookingDetails) {
-                amount += (long) (bookingDetail.getFood().getPrice() * bookingDetail.getQuantity());
+            if (booking.getPayments().isEmpty()){ // thanh toàn đặt bàn
+                return (long) booking.getPrePaidFee();
+            } else { // thanh toán gọi thêm món
+                long amount = 0;
+                BookingDetailDao bookingDetailDao = new BookingDetailDao();
+                List<BookingDetail> bookingDetails = bookingDetailDao.getBookingDetailsByBookingIdAndFoods(booking.getId());
+                for (BookingDetail bookingDetail : bookingDetails) {
+                    amount += (long) (bookingDetail.getFood().getPrice() * bookingDetail.getQuantity());
+                }
+                return amount;
             }
-            return amount;
         }
     }
 
@@ -157,8 +167,6 @@ public class PaymentController {
             if (payment.transactionStatus == TransactionStatus.SUCCESS){
                 booking.setStatus(BookingStatus.COMPLETED);
                 booking.setAmount(payment.getAmount());
-            } else {
-                booking.setStatus(BookingStatus.CANCELLED);
             }
             bookingDao.update(booking);
             payment.setBooking(booking);

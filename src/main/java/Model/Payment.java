@@ -1,5 +1,6 @@
 package Model;
 
+import Model.Constant.PaymentType;
 import Model.Constant.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,9 +16,13 @@ import java.sql.Timestamp;
 @ToString
 public class Payment extends DistributedEntity{
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentType type;
+
     private long amount;
     public String txnRef;
     public String orderInfo;
