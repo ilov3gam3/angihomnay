@@ -1,166 +1,225 @@
 <%@ page import="java.util.List" %>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
+
+<!-- Mirrored from www.ansonika.com/foores/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 24 Jul 2025 13:51:43 GMT -->
 <head>
-    <title>AnGiHomNay - Nền tảng đánh giá và gợi ý ẩm thực</title>
-    <%@include file="../common/head.jsp" %>
+    <title>Foores - Single Restaurant Version</title>
+    <%@include file="../common/reservation/head.jsp"%>
+    <link href="<%=request.getContextPath()%>/assets/reservation/css/shop.css" rel="stylesheet">
 </head>
+
 <body>
-<%@include file="../common/header.jsp" %>
-<!-- Main Content -->
-<main class="page-wrapper d-flex flex-column min-vh-100">
-    <%
-        List<AllergyType> allergies = new Dao.AllergyTypeDao().getAll();
-        List<Taste> tastes = new Dao.TasteDao().getAll();
-        List<Category> categories = new Dao.CategoryDao().getAll();
-    %>
-    <div class="search-bar mb-5 ">
-        <div class="search-wrapper">
-            <%
-                String searchString = request.getParameter("searchString");
-                String priceFrom = request.getParameter("priceFrom");
-                String priceTo = request.getParameter("priceTo");
 
-                String[] selectedCategoryIds = request.getParameterValues("categories");
-                String[] selectedAllergyIds = request.getParameterValues("allergyContents");
-                String[] selectedTasteIds = request.getParameterValues("tastes");
+<div id="preloader">
+    <div data-loader="circle-side"></div>
+</div><!-- /Page Preload -->
 
-                java.util.Set<String> catSet = selectedCategoryIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedCategoryIds)) : java.util.Collections.emptySet();
-                java.util.Set<String> allergySet = selectedAllergyIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedAllergyIds)) : java.util.Collections.emptySet();
-                java.util.Set<String> tasteSet = selectedTasteIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedTasteIds)) : java.util.Collections.emptySet();
-            %>
+<%@include file="../common/reservation/header.jsp"%>
+<!-- /header -->
+<%
+    List<AllergyType> allergies = new Dao.AllergyTypeDao().getAll();
+    List<Taste> tastes = new Dao.TasteDao().getAll();
+    List<Category> categories = new Dao.CategoryDao().getAll();
 
-            <form action="<%=request.getContextPath()%>/search" method="get" class="row g-3 align-items-end">
+    String searchString = request.getParameter("searchString");
+    String priceFrom = request.getParameter("priceFrom");
+    String priceTo = request.getParameter("priceTo");
 
-                <!-- Search string -->
-                <div class="col-lg-5 col-md-12">
-                    <div class="search-input position-relative">
-                        <i class="fas fa-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
-                        <input type="text" class="form-control ps-5" name="searchString"
-                               placeholder="Tìm kiếm món ăn, mô tả..."
-                               value="<%=searchString != null ? searchString : ""%>">
+    String[] selectedCategoryIds = request.getParameterValues("categories");
+    String[] selectedAllergyIds = request.getParameterValues("allergyContents");
+    String[] selectedTasteIds = request.getParameterValues("tastes");
+
+    java.util.Set<String> catSet = selectedCategoryIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedCategoryIds)) : java.util.Collections.emptySet();
+    java.util.Set<String> allergySet = selectedAllergyIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedAllergyIds)) : java.util.Collections.emptySet();
+    java.util.Set<String> tasteSet = selectedTasteIds != null ? new java.util.HashSet<>(java.util.Arrays.asList(selectedTasteIds)) : java.util.Collections.emptySet();
+%>
+<main>
+    <div class="filters_full clearfix">
+        <div class="container">
+            <a href="#0" class="open_filters btn_filters"><i class="icon_adjust-vert"></i></a>
+            <div class="sort_select">
+                <select name="sort" id="sort">
+                    <option value="popularity" selected="selected">Sort by Popularity</option>
+                    <option value="rating">Sort by Average rating</option>
+                    <option value="date">Sort by newness</option>
+                    <option value="price">Sort by Price: low to high</option>
+                    <option value="price-desc">Sort by Price: high to low</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container margin_60_40">
+
+        <div class="row">
+            <aside class="col-lg-3" id="sidebar_fixed">
+                <form action="<%=request.getContextPath()%>/search" method="get">
+                    <div class="filter_col">
+                        <div class="inner_bt">
+                            <a href="#" class="open_filters"><i class="icon_close"></i></a>
+                        </div>
+
+                        <div class="filter_type version_2">
+                            <h4><a href="#filter_1" data-bs-toggle="collapse" class="opened">Tên món ăn</a></h4>
+                            <div class="collapse show" id="filter_1">
+                                <input type="text" class="form-control" name="searchString" value="<%=searchString != null ? searchString : ""%>">
+                            </div>
+                        </div>
+
+                        <!-- Loại món ăn -->
+                        <div class="filter_type version_2">
+                            <h4><a href="#filter_1" data-bs-toggle="collapse" class="opened">Loại món ăn</a></h4>
+                            <div class="collapse show" id="filter_1">
+                                <ul>
+                                    <% for (Category c : categories) { %>
+                                    <li>
+                                        <label class="container_check"><%=c.getName()%>
+                                            <input type="checkbox" name="categories" value="<%=c.getId()%>"
+                                                <%= catSet != null && catSet.contains(String.valueOf(c.getId())) ? "checked" : "" %>>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Hương vị -->
+                        <div class="filter_type version_2">
+                            <h4><a href="#filter_2" data-bs-toggle="collapse" class="opened">Hương vị</a></h4>
+                            <div class="collapse show" id="filter_2">
+                                <ul>
+                                    <% for (Taste t : tastes) { %>
+                                    <li>
+                                        <label class="container_check"><%=t.getName()%>
+                                            <input type="checkbox" name="tastes" value="<%=t.getId()%>"
+                                                <%= tasteSet != null && tasteSet.contains(String.valueOf(t.getId())) ? "checked" : "" %>>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Dị ứng -->
+                        <div class="filter_type version_2">
+                            <h4><a href="#filter_3" data-bs-toggle="collapse" class="opened">Không chứa thành phần dị ứng</a></h4>
+                            <div class="collapse show" id="filter_3">
+                                <ul>
+                                    <% for (AllergyType a : allergies) { %>
+                                    <li>
+                                        <label class="container_check"><%=a.getName()%>
+                                            <input type="checkbox" name="allergyContents" value="<%=a.getId()%>"
+                                                <%= allergySet != null && allergySet.contains(String.valueOf(a.getId())) ? "checked" : "" %>>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Giá -->
+                        <div class="filter_type version_2">
+                            <h4><a href="#filter_4" data-bs-toggle="collapse" class="opened">Giá</a></h4>
+                            <div class="collapse show" id="filter_4">
+                                Giá từ
+                                <input type="number" class="form-control" name="priceFrom" step="1000"
+                                       value="<%= priceFrom != null ? priceFrom : "" %>">
+                                đến
+                                <input type="number" class="form-control" name="priceTo" step="1000"
+                                       value="<%= priceTo != null ? priceTo : "" %>">
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="buttons">
+                            <button type="submit" class="btn_1">Tìm kiếm</button>
+                            <a href="<%=request.getContextPath()%>/search" class="btn_1 gray">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </aside>
+
+            <!-- /col -->
+            <div class="col-lg-9">
+                <%
+                    List<Food> foodList = (List<Food>) request.getAttribute("foodList");
+                    List<List<ReviewDetail>> details = (List<List<ReviewDetail>>) request.getAttribute("details");
+                %>
+                <% if (foodList!= null && !foodList.isEmpty()) { %>
+                <% int i = 0; for (Food food : foodList) {%>
+                <div class="row row_item" data-cue="slideInUp">
+                    <div class="col-sm-4">
+                        <figure>
+                            <a href="<%=request.getContextPath()%>/food-detail?id=<%=food.getId()%>">
+                                <img class="img-fluid lazy" src="<%=food.getImage()%>" data-src="<%=food.getImage()%>" alt="">
+                            </a>
+                        </figure>
+                    </div>
+                    <div class="col-sm-8">
+                        <%
+                            int count = 0;
+                            for (int j = 0; j < details.get(i).size(); j++) {
+                                count += details.get(i).get(j).getRating();
+                            }
+                            float avg = (float) count / details.get(i).size();
+                        %>
+                        <div class="rating"><%=avg%><i class="icon_star voted"></i><%=details.get(i).size()%> đánh giá</div>
+                        <a href="<%=request.getContextPath()%>/food-detail?id=<%=food.getId()%>">
+                            <h3><%=food.getName()%></h3>
+                        </a>
+                        <p><%=food.getDescription()%></p>
+                        <div class="price_box">
+                            <span class="new_price"><%=food.getPrice()%> VND</span>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Price range -->
-                <div class="col-md-2">
-                    <input type="number" class="form-control" name="priceFrom" min="0" step="1000" placeholder="Giá từ"
-                           value="<%=priceFrom != null ? priceFrom : ""%>">
-                </div>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" name="priceTo" min="0" step="1000" placeholder="Giá đến"
-                           value="<%=priceTo != null ? priceTo : ""%>">
-                </div>
-
-                <!-- Submit -->
-                <div class="col-3">
-                    <button type="submit" class="btn btn-primary px-4 search-btn">Tìm kiếm</button>
-                </div>
-
-                <!-- Categories -->
-                <div class="col-md-4">
-                    <label class="form-label">Loại món ăn</label>
-                    <select name="categories" class="form-control select2" multiple>
-                        <% for (Category c : categories) { %>
-                        <option value="<%=c.getId()%>"
-                                <%= catSet.contains(String.valueOf(c.getId())) ? "selected" : "" %>>
-                            <%=c.getName()%>
-                        </option>
-                        <% } %>
-                    </select>
-                </div>
-
-                <!-- Allergy contents -->
-                <div class="col-md-4">
-                    <label class="form-label">Dị ứng</label>
-                    <select name="allergyContents" class="form-control select2" multiple>
-                        <% for (AllergyType a : allergies) { %>
-                        <option value="<%=a.getId()%>"
-                                <%= allergySet.contains(String.valueOf(a.getId())) ? "selected" : "" %>>
-                            <%=a.getName()%>
-                        </option>
-                        <% } %>
-                    </select>
-                </div>
-
-                <!-- Tastes -->
-                <div class="col-md-4">
-                    <label class="form-label">Hương vị</label>
-                    <select name="tastes" class="form-control select2" multiple>
-                        <% for (Taste t : tastes) { %>
-                        <option value="<%=t.getId()%>"
-                                <%= tasteSet.contains(String.valueOf(t.getId())) ? "selected" : "" %>>
-                            <%=t.getName()%>
-                        </option>
-                        <% } %>
-                    </select>
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-
-    <div style="height: 120px;"></div>
-    <div class="container">
-    <%
-        List<Food> foodList = (List<Food>) request.getAttribute("foodList");
-        if (foodList != null) {
-    %>
-    <div class="food-grid">
-        <% if (foodList.isEmpty()) { %>
-        <p>Không tìm thấy món ăn nào phù hợp.</p>
-        <% } else {
-            for (Food food : foodList) {
-        %>
-        <div class="food-card">
-            <div class="food-image">
-                <img src="<%=food.getImage()%>" alt="<%=food.getName()%>">
+                <% i++; %>
+                <% } %>
+                <% } else { %>
+                <p>Không tìm thấy món ăn nào phù hợp.</p>
+                <% } %>
             </div>
-            <div class="food-info">
-                <h4><%=food.getName()%></h4>
-                <div class="rating">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="far fa-star"></i>
-                    <span>(4.0)</span> <%-- Chưa có rating trong model --%>
-                </div>
-                <p class="food-tags">
-                    <% for (Category c : food.getCategories()) { %>
-                    <span><%=c.getName()%></span>
-                    <% } %>
-                </p>
-                <p class="food-tags">
-                    <% for (Taste t : food.getTastes()) { %>
-                    <span><%=t.getName()%></span>
-                    <% } %>
-                </p>
-            </div>
+            <!-- /col -->
         </div>
-        <%  }
-        }
-        %>
-    </div>
-    <% } %>
+        <!-- /row -->
     </div>
 </main>
+<!-- /main -->
 
-<!-- Footer -->
-<%@include file="../common/footer.jsp" %>
+<%@include file="../common/reservation/footer.jsp"%>
+<!--/footer-->
+
+<div id="toTop"></div><!-- Back to top button -->
+
+<!-- Modal terms -->
+<div class="modal fade" id="terms-txt" tabindex="-1" role="dialog" aria-labelledby="termsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="termsLabel">Terms and conditions</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in <strong>nec quod novum accumsan</strong>, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus. Lorem ipsum dolor sit amet, <strong>in porro albucius qui</strong>, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<%@include file="../common/reservation/js.jsp"%>
+
 </body>
-<%@include file="../common/foot.jsp" %>
-<%@include file="../common/js.jsp" %>
-<script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            placeholder: "Chọn mục...",
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('.search-bar')
-        });
-    });
-</script>
+
+<!-- Mirrored from www.ansonika.com/foores/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 24 Jul 2025 13:51:44 GMT -->
 </html>

@@ -35,8 +35,8 @@
         </ul>
 
         <!-- Search -->
-        <form class="d-flex me-3" role="search">
-            <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search">
+        <form class="d-flex me-3" role="search" action="<%=request.getContextPath()%>/search">
+            <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="searchString">
             <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
         </form>
 
@@ -57,6 +57,12 @@
                     <a class="dropdown-item"
                        href="<%= request.getContextPath()%>/<%=user.getRole() == Role.CUSTOMER ? "customer" : "restaurant"%>/profile"><i
                             class="fas fa-user"></i> Trang cá nhân</a></li>
+                <% } %>
+                <% if (user.getRole() != Role.ADMIN) {%>
+                <li>
+                <a class="dropdown-item"
+                   href="<%= request.getContextPath()%>/customer/bookings"><i
+                        class="fas fa-utensils"></i> Booking của bạn</a></li>
                 <% } %>
                 <li><a class="dropdown-item" href="<%= request.getContextPath() %>/logout"><i
                         class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>

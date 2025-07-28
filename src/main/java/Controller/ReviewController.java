@@ -21,8 +21,22 @@ public class ReviewController {
     @WebServlet("/customer/review")
     public static class CustomerReviewServlet extends HttpServlet {
         @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            BookingDao bookingDao = new BookingDao();
+            ReviewDao reviewDao = new ReviewDao();
+            long bookingId = Long.parseLong(req.getParameter("bookingId"));
+            if (reviewDao.getReviewByBookingId(bookingId) != null) {
+                req.getSession().setAttribute("flash_error", "Bạn đã đánh giá cho đơn này rồi.");
+                resp.sendRedirect(req.getContextPath() + "/customer/bookings");
+                return;
+            }
+            Booking booking = bookingDao.getBookingByIdAndDetails(bookingId);
+            req.setAttribute("booking", booking);
+            req.getRequestDispatcher("/views/customer/review.jsp").forward(req, resp);
+        }
+
+        @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            super.doPost(req, resp);
             try {
                 long bookingId = Long.parseLong(req.getParameter("bookingId"));
                 String comment = req.getParameter("comment");
@@ -35,7 +49,7 @@ public class ReviewController {
                 Booking booking = bookingDao.getByIdWithDetails(bookingId);
                 if (booking == null || booking.getBookingDetails() == null) {
                     req.getSession().setAttribute("flash_error", "Không tìm thấy đơn đặt món.");
-                    resp.sendRedirect(req.getHeader("referer"));
+                    resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                     return;
                 }
 
@@ -80,7 +94,7 @@ public class ReviewController {
                 e.printStackTrace();
                 req.getSession().setAttribute("flash_error", "Đã có lỗi xảy ra khi gửi đánh giá.");
             }
-            resp.sendRedirect(req.getHeader("referer"));
+            resp.sendRedirect(req.getContextPath() + "/customer/bookings");
         }
     }
 }

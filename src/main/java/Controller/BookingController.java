@@ -197,4 +197,15 @@ public class BookingController {
             resp.sendRedirect(req.getHeader("referer"));
         }
     }
+    @WebServlet("/customer/bookings")
+    public static class CustomerBookingServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            BookingDao bookingDao = new BookingDao();
+            User user = (User) req.getSession().getAttribute("user");
+            List<Booking> bookings = bookingDao.getByUserId(user.getId());
+            req.setAttribute("bookings", bookings);
+            req.getRequestDispatcher("/views/customer/your-bookings.jsp").forward(req, resp);
+        }
+    }
 }

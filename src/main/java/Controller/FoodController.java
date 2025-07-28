@@ -1,17 +1,8 @@
 package Controller;
 
-import Dao.CategoryDao;
-import Dao.FoodDao;
-import Dao.RestaurantDao;
-import Dao.TasteDao;
-import Dao.AllergyTypeDao;
-import Model.Taste;
-import Model.AllergyType;
+import Dao.*;
+import Model.*;
 
-import Model.Category;
-import Model.Food;
-import Model.Restaurant;
-import Model.User;
 import Util.UploadImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -160,7 +151,13 @@ public class FoodController {
 //                System.out.println(result.get(i).getTastes());
 //            }
 //            System.out.println("debug in servlet");
+            List<Long> foodIds = new ArrayList<>();
+            for (Food food : result) {
+                foodIds.add(food.getId());
+            }
+            List<List<ReviewDetail>> details = new ReviewDetailDao().findReviewDetailsByFoodIdsInOrder(foodIds);
             req.setAttribute("foodList", result);
+            req.setAttribute("details", details);
             req.getRequestDispatcher("/views/public/search.jsp").forward(req, resp);
         }
         private Double parseDouble(String s) {
@@ -169,6 +166,26 @@ public class FoodController {
             } catch (NumberFormatException e) {
                 return null;
             }
+        }
+    }
+
+    @WebServlet("/food-detail")
+    public static class FoodDetailServlet extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
+            FoodDao foodDao = new FoodDao();
+            ReviewDetailDao reviewDetailDao = new ReviewDetailDao();
+            Food food = foodDao.getById(id);
+            if (food == null) {
+                req.getSession().setAttribute("flash_success", "Không tìm thấy món ăn này.");
+                resp.sendRedirect(req.getContextPath() + "/");
+                return;
+            }
+            List<ReviewDetail> reviewDetails = reviewDetailDao.getDetailsByFoodId(food.getId());
+            req.setAttribute("reviewDetails", reviewDetails);
+            req.setAttribute("food", food);
+            req.getRequestDispatcher("/views/public/food-detail.jsp").forward(req, resp);
         }
     }
 }

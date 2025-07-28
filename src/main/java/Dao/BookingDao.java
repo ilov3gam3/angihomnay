@@ -44,4 +44,13 @@ public class BookingDao extends GenericDao<Booking> {
                 .setParameter("startTime", thirtyMinAgo)
                 .executeUpdate();
     }
+    public List<Booking> getByUserId(long userId) {
+        TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b where b.customer.id = :userId", Booking.class);
+        return query.setParameter("userId", userId).getResultList();
+    }
+    public Booking getBookingByIdAndDetails(long bookingId) {
+        TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b left join fetch b.bookingDetails where b.id = :bookingId", Booking.class);
+        query.setParameter("bookingId", bookingId);
+        return query.getResultStream().findFirst().orElse(null);
+    }
 }

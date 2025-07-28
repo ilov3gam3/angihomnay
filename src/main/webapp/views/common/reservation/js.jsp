@@ -3,6 +3,8 @@
 <script src="<%=request.getContextPath()%>/assets/reservation/js/common_scripts.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/reservation/js/slider.js"></script>
 <script src="<%=request.getContextPath()%>/assets/reservation/js/common_func.js"></script>
+<script src="<%=request.getContextPath()%>/assets/reservation/js/specific_shop.js"></script>
+<script src="<%=request.getContextPath()%>/assets/reservation/js/sticky_sidebar.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/reservation/phpmailer/validate.js"></script>
 
 <!-- SPECIFIC SCRIPTS (wizard form) -->
