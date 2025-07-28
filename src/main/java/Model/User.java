@@ -31,7 +31,7 @@ public class User extends DistributedEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "allergy_id")
     )
-    private List<AllergyType> allergies;
+    private Set<AllergyType> allergies;
     @ManyToMany
     @JoinTable(
             name = "user_taste",

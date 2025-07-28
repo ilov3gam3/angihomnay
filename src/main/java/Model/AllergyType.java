@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "alergy_types")
+@Table(name = "allergy_types")
 public class AllergyType extends DistributedEntity{
     private String name;
 }

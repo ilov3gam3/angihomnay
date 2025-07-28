@@ -1,8 +1,10 @@
 package Controller;
 
+import Dao.AllergyTypeDao;
 import Dao.CustomerDao;
 import Dao.TasteDao;
 import Dao.UserDao;
+import Model.AllergyType;
 import Model.Constant.Gender;
 import Model.Customer;
 import Model.Taste;
@@ -55,11 +57,31 @@ public class CustomerController {
             UserDao userDao = new UserDao();
             User user = (User) req.getSession().getAttribute("user");
             user = userDao.getById(user.getId());
-            List<Long> tastesIds = Optional.ofNullable(req.getParameterValues("tastesIds")).stream().flatMap(Arrays::stream)
+            List<Long> tastesIds = Optional.ofNullable(req.getParameterValues("tastes")).stream().flatMap(Arrays::stream)
                     .map(Long::parseLong)
                     .toList();
             Set<Taste> tastes = new HashSet<>(tasteDao.getByIds(tastesIds));
             user.setFavoriteTastes(tastes);
+            userDao.update(user);
+            req.getSession().setAttribute("user", user);
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/customer/allergies")
+    public static class AllergiesServlet extends HttpServlet {
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            AllergyTypeDao allergyTypeDao = new AllergyTypeDao();
+            UserDao userDao = new UserDao();
+            User user = (User) req.getSession().getAttribute("user");
+            user = userDao.getById(user.getId());
+            List<Long> allergies = Optional.ofNullable(req.getParameterValues("allergies")).stream().flatMap(Arrays::stream)
+                    .map(Long::parseLong)
+                    .toList();
+            System.out.println(allergies);
+            Set<AllergyType> tastes = new HashSet<>(allergyTypeDao.getByIds(allergies));
+            user.setAllergies(tastes);
             userDao.update(user);
             req.getSession().setAttribute("user", user);
             resp.sendRedirect(req.getHeader("referer"));

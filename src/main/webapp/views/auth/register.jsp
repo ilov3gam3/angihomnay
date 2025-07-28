@@ -1,198 +1,135 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký - AnGiHomNay</title>
-    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/assets/img/logo.jpg">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/auth.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/animations.css">
-    <link rel="stylesheet" href="<%= request.getContextPath()%>/assets/css/search.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .form-col {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .field-error {
-            color: red;
-            font-size: 13px;
-        }
-
-        .password-group {
-            display: flex;
-            align-items: center;
-        }
-
-        .password-group input {
-            flex: 1;
-        }
-
-        .password-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-
-        .checkbox-group {
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
+    <title>Đăng ký tài khoản</title>
+    <%@ include file="../common/reservation/head.jsp" %>
 </head>
 
 <body>
-<div class="auth-container">
-    <div class="auth-card fade-in">
-        <!-- Logo -->
-        <div class="auth-logo">
-            <img src="${pageContext.request.contextPath}/assets/img/logo.jpg" alt="AnGiHomNay">
-        </div>
 
-        <!-- Header -->
-        <div class="auth-header">
-            <h2>Đăng ký tài khoản</h2>
-            <p>Tạo tài khoản để khám phá thế giới ẩm thực cùng AnGiHomNay</p>
-        </div>
+<%@ include file="../common/reservation/header.jsp" %>
 
-        <!-- Registration Form -->
-        <form class="auth-form" action="${pageContext.request.contextPath}/register" method="POST" id="registerForm">
-            <div class="form-row">
-                <!-- Cột trái -->
-                <div class="form-col">
-                    <!-- First Name -->
-                    <div class="form-group">
-                        <label for="firstName"><i class="fas fa-user"></i> Họ</label>
-                        <input type="text" id="firstName" name="firstName" class="input-focus-animation" placeholder="Nhập họ" required>
-                        <div class="field-error" id="firstNameError"></div>
-                    </div>
-
-                    <!-- Last Name -->
-                    <div class="form-group">
-                        <label for="lastName"><i class="fas fa-user"></i> Tên</label>
-                        <input type="text" id="lastName" name="lastName" class="input-focus-animation" placeholder="Nhập tên" required>
-                        <div class="field-error" id="lastNameError"></div>
-                    </div>
-
-                    <!-- Date of Birth -->
-                    <div class="form-group">
-                        <label for="dob"><i class="fas fa-calendar-alt"></i> Ngày sinh</label>
-                        <input type="date" id="dob" name="dob" class="input-focus-animation" required>
-                        <div class="field-error" id="dobError"></div>
-                    </div>
-
-                    <!-- Gender -->
-                    <div class="form-group">
-                        <label for="gender"><i class="fas fa-venus-mars"></i> Giới tính</label>
-                        <select id="gender" name="gender" class="input-focus-animation filter-select" required>
-                            <option value="" disabled selected>Chọn giới tính</option>
-                            <option value="MALE">Nam</option>
-                            <option value="FEMALE">Nữ</option>
-                            <option value="OTHER">Khác</option>
-                        </select>
-                        <div class="field-error" id="genderError"></div>
-                    </div>
-                </div>
-
-                <!-- Cột phải -->
-                <div class="form-col">
-                    <!-- Email -->
-                    <div class="form-group">
-                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="email" name="email" class="input-focus-animation" placeholder="Nhập email" required>
-                        <div class="field-error" id="emailError"></div>
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="form-group">
-                        <label for="phone"><i class="fas fa-phone"></i> Số điện thoại</label>
-                        <input type="tel" id="phone" name="phone" class="input-focus-animation" placeholder="Nhập số điện thoại" required>
-                        <div class="field-error" id="phoneError"></div>
-                    </div>
-
-                    <!-- Address -->
-                    <div class="form-group">
-                        <label for="address"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
-                        <input type="text" id="address" name="address" class="input-focus-animation" placeholder="Nhập địa chỉ" required>
-                        <div class="field-error" id="addressError"></div>
-                    </div>
-                </div>
+<main class="bg-light min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="card shadow p-4 rounded-4 mx-auto" style="max-width: 850px;">
+            <div class="text-center mb-4">
+                <img src="${pageContext.request.contextPath}/assets/img/logo.jpg" alt="AnGiHomNay" height="60">
+                <h2 class="mt-3">Đăng ký tài khoản</h2>
+                <p class="text-muted">Tạo tài khoản để khám phá thế giới ẩm thực cùng AnGiHomNay</p>
             </div>
 
-            <!-- Password -->
-            <div class="form-group">
-                <label for="password"><i class="fas fa-lock"></i> Mật khẩu</label>
-                <div class="password-group">
-                    <input type="password" id="password" name="password" class="input-focus-animation" placeholder="Nhập mật khẩu" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
-                        <i class="fas fa-eye" id="passwordIcon"></i>
+            <form action="${pageContext.request.contextPath}/register" method="POST" id="registerForm">
+                <div class="row">
+                    <!-- Cột trái -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label"><i class="fas fa-user"></i> Họ</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required placeholder="Nhập họ">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label"><i class="fas fa-user"></i> Tên</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required placeholder="Nhập tên">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dob" class="form-label"><i class="fas fa-calendar-alt"></i> Ngày sinh</label>
+                            <input type="date" class="form-control" id="dob" name="dob" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label"><i class="fas fa-venus-mars"></i> Giới tính</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="" disabled selected>Chọn giới tính</option>
+                                <option value="MALE">Nam</option>
+                                <option value="FEMALE">Nữ</option>
+                                <option value="OTHER">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Cột phải -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="email" class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="Nhập email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label"><i class="fas fa-phone"></i> Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required placeholder="Nhập số điện thoại">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
+                            <input type="text" class="form-control" id="address" name="address" required placeholder="Nhập địa chỉ">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mật khẩu -->
+                <div class="mb-3">
+                    <label for="password" class="form-label"><i class="fas fa-lock"></i> Mật khẩu</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Nhập mật khẩu">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', 'passwordIcon')">
+                            <i class="fas fa-eye" id="passwordIcon"></i>
+                        </button>
+                    </div>
+                    <small class="form-text text-muted">Mật khẩu phải có ít nhất 6 ký tự</small>
+                </div>
+
+                <!-- Xác nhận mật khẩu -->
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label"><i class="fas fa-lock"></i> Xác nhận mật khẩu</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Nhập lại mật khẩu">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
+                            <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Điều khoản -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                    <label class="form-check-label" for="terms">
+                        Tôi đồng ý với <a href="#" class="text-danger text-decoration-none">Điều khoản sử dụng</a> và
+                        <a href="#" class="text-danger text-decoration-none">Chính sách bảo mật</a>
+                    </label>
+                </div>
+
+                <!-- Đăng ký -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-user-plus me-2"></i> Đăng ký
                     </button>
                 </div>
-                <div class="field-error" id="passwordError"></div>
-                <small class="form-text">Mật khẩu phải có ít nhất 6 ký tự</small>
+            </form>
+
+            <!-- Liên kết đăng nhập -->
+            <div class="text-center mt-3">
+                <p>Đã có tài khoản? <a href="${pageContext.request.contextPath}/login" class="text-danger text-decoration-none">Đăng nhập ngay</a></p>
             </div>
-
-            <!-- Confirm Password -->
-            <div class="form-group">
-                <label for="confirmPassword"><i class="fas fa-lock"></i> Xác nhận mật khẩu</label>
-                <div class="password-group">
-                    <input type="password" id="confirmPassword" name="confirmPassword" class="input-focus-animation" placeholder="Nhập lại mật khẩu" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
-                        <i class="fas fa-eye" id="confirmPasswordIcon"></i>
-                    </button>
-                </div>
-                <div class="field-error" id="confirmPasswordError"></div>
-            </div>
-
-            <!-- Điều khoản -->
-            <div class="checkbox-group">
-                <input type="checkbox" id="terms" name="terms" required>
-                <label for="terms">
-                    Tôi đồng ý với <a href="#" style="color: var(--primary-color);">Điều khoản sử dụng</a>
-                    và <a href="#" style="color: var(--primary-color);">Chính sách bảo mật</a>
-                </label>
-            </div>
-
-            <!-- Submit -->
-            <button type="submit" class="auth-btn btn-hover-effect" id="registerBtn">
-                <i class="fas fa-user-plus"></i>
-                Đăng ký
-            </button>
-        </form>
-
-        <!-- Login Link -->
-        <div class="auth-links">
-            <p>Đã có tài khoản? <a href="${pageContext.request.contextPath}/login">Đăng nhập ngay</a>
-            </p>
         </div>
     </div>
-</div>
+</main>
 
-<!-- JavaScript -->
+<%@ include file="../common/reservation/footer.jsp" %>
+<%@ include file="../common/reservation/js.jsp" %>
+
+<script>
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
 <script>
     // Toggle Password Visibility
     function togglePassword(inputId) {
@@ -308,7 +245,5 @@
         }
     });
 </script>
-<%@include file="../common/foot.jsp"%>
-<%@include file="../common/js.jsp"%>
 </body>
 </html>

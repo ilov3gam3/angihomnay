@@ -1,15 +1,16 @@
 package Controller;
 
+import Dao.FoodDao;
 import Dao.RestaurantDao;
 import Dao.RestaurantTableDao;
-import Model.Restaurant;
-import Model.RestaurantTable;
-import Model.User;
+import Model.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -146,4 +147,66 @@ public class RestaurantController {
             resp.sendRedirect(req.getContextPath() + "/restaurant/tables");
         }
     }
+
+    @WebServlet("/api/open-hours")
+    public static class OpenHoursServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            long id = Long.parseLong(req.getParameter("resId"));
+            Restaurant restaurant = new RestaurantDao().getById(id);
+            if (restaurant == null) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } else {
+                JSONObject time = new JSONObject();
+                time.put("open", restaurant.getOpenTime());
+                time.put("close", restaurant.getCloseTime());
+                resp.getWriter().write(time.toString());
+            }
+        }
+    }
+
+    @WebServlet("/api/get-foods-of-restaurant")
+    public static class GetFoodsOfRestaurant extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            long id = Long.parseLong(req.getParameter("id"));
+            Restaurant restaurant = new RestaurantDao().getById(id);
+            if (restaurant == null) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Restaurant not found");
+            } else {
+                List<Food> foods = new FoodDao().getFoodsOfRestaurant(restaurant);
+                JSONArray jsonArray = new JSONArray();
+
+                for (Food food : foods) {
+                    JSONObject jsonFood = new JSONObject();
+                    jsonFood.put("id", food.getId());
+                    jsonFood.put("name", food.getName());
+                    jsonFood.put("description", food.getDescription());
+                    jsonFood.put("price", food.getPrice());
+                    jsonFood.put("image", food.getImage());
+                    jsonFood.put("isAvailable", food.isAvailable());
+
+                    // Add categories
+                    JSONArray jsonCategories = new JSONArray();
+                    if (food.getCategories() != null) {
+                        for (Category category : food.getCategories()) {
+                            JSONObject jsonCategory = new JSONObject();
+                            jsonCategory.put("id", category.getId());
+                            jsonCategory.put("name", category.getName());
+                            jsonCategories.put(jsonCategory);
+                        }
+                    }
+                    jsonFood.put("categories", jsonCategories);
+
+                    jsonArray.put(jsonFood);
+                }
+                resp.getWriter().write(jsonArray.toString());
+            }
+        }
+    }
+
 }

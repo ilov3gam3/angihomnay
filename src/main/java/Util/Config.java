@@ -12,7 +12,7 @@ public class Config {
     public static final String google_oauth_client_secret = "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";
     public final String google_oauth_redirect_uri = app_url + contextPath + "/login-google";
 
-    public static String vnp_ReturnUrl = app_url + "/angihomnay_war_exploded/vnpay-result";
+    public String vnp_ReturnUrl = app_url + contextPath + "/vnpay-result";
     public static String vnp_TmnCode = "1C2CNWD5";
     public static String secretKey = "926KDGVCWQERI7FJMXRUQTK9MBMPYW4E";
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";

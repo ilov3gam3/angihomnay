@@ -1,103 +1,53 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <title>Quên mật khẩu - AnGiHomNay</title>
-    <meta charset="UTF-8">
-    <%@include file="../common/head.jsp"%>
-    <link rel="stylesheet" href="<%= request.getContextPath()%>/assets/css/auth.css">
-    <style>
-        .success-message {
-            text-align: center;
-            color: #2ecc71;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f0fff4;
-            border-radius: 5px;
-        }
-
-        .error-message {
-            text-align: center;
-            color: #de0c0c;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f0fff4;
-            border-radius: 5px;
-        }
-
-        .success-message i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .back-to-login {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .back-to-login a {
-            color: #ff7979;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .back-to-login a:hover {
-            text-decoration: underline;
-        }
-
-        .temp-password {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-top: 1rem;
-            text-align: center;
-        }
-    </style>
+    <title>Đặt lại mật khẩu - AnGiHomNay</title>
+    <%@ include file="../common/reservation/head.jsp" %>
 </head>
 <body>
-<!-- Header -->
-<header class="header">
-    <div class="header-container">
-        <div class="logo">
-            <a href="<%= request.getContextPath() %>/view/index.jsp"><h1>AnGiHomNay</h1></a>
-        </div>
-    </div>
-</header>
+<div id="preloader">
+    <div data-loader="circle-side"></div>
+</div>
 
-<main class="auth-container">
-    <div class="auth-box auth-card">
-        <h2>Quên mật khẩu</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 2rem;">
-            Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu
-        </p>
-        <form id="forgotPasswordForm" class="auth-form" action="<%=request.getContextPath()%>/reset-password" method="post" >
-            <input type="hidden" name="token" value="<%=request.getParameter("token")%>">
-            <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu của bạn">
+<%@ include file="../common/reservation/header.jsp" %>
+
+<main class="bg-light min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm border-0 p-4">
+                    <div class="text-center mb-4">
+                        <h2>Đặt lại mật khẩu</h2>
+                        <p class="text-muted mb-0">Nhập mật khẩu mới cho tài khoản của bạn</p>
+                    </div>
+
+                    <form action="<%= request.getContextPath() %>/reset-password" method="post">
+                        <input type="hidden" name="token" value="<%= request.getAttribute("token") %>">
+
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required placeholder="Nhập mật khẩu mới">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Nhập lại mật khẩu">
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100">Xác nhận</button>
+
+                        <div class="text-center mt-3">
+                            <a href="<%= request.getContextPath() %>/login" class="text-decoration-none">Quay lại đăng nhập</a>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="confirmPassword">Xác nhận lại mật khẩu</label>
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Nhập mật khẩu của bạn">
-                </div>
-            </div>
-            <button type="submit" class="btn-primary btn-login-submit">Đặt lại mật khẩu</button>
-        </form>
+        </div>
     </div>
 </main>
 
-<%@include file="../common/footer.jsp"%>
+<%@ include file="../common/reservation/footer.jsp" %>
+<%@ include file="../common/reservation/js.jsp" %>
 </body>
-<%@include file="../common/foot.jsp"%>
-<%@include file="../common/js.jsp"%>
 </html>

@@ -24,7 +24,18 @@ public class RestaurantTableDao extends GenericDao<RestaurantTable> {
         return count > 0;
     }
     public RestaurantTable findAvailableTable(long restaurantId, LocalDateTime startTime, LocalDateTime endTime) {
-        TypedQuery<RestaurantTable> query = entityManager.createQuery("select rt from RestaurantTable  rt where rt.restaurant.id = :restaurantId and rt.id not in (select b.table.id from Booking b where b.status != 'CANCELLED' and b.startTime <: endTime and b.endTime > :startTime)", RestaurantTable.class);
+        TypedQuery<RestaurantTable> query = entityManager.createQuery("""
+                    select rt from RestaurantTable rt
+                    where rt.restaurant.id = :restaurantId
+                    and rt.isAvailable = true
+                    and not exists (
+                        select 1 from Booking b
+                        where b.table.id = rt.id
+                        and b.status != 'CANCELLED'
+                        and b.startTime < :endTime
+                        and b.endTime > :startTime
+                    )
+                """, RestaurantTable.class);
         List<RestaurantTable> results = query
                 .setParameter("restaurantId", restaurantId)
                 .setParameter("startTime", startTime)

@@ -59,7 +59,7 @@ public class PaymentController {
             } else {
                 vnp_Params.put("vnp_Locale", "vn");
             }
-            vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
+            vnp_Params.put("vnp_ReturnUrl", new Config().vnp_ReturnUrl);
             vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
             Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -147,8 +147,13 @@ public class PaymentController {
             String paid_at = req.getParameter("vnp_PayDate");
             String vnp_OrderInfo = req.getParameter("vnp_OrderInfo");
             Payment payment = paymentDao.findByOrderInfo(vnp_OrderInfo);
-            if (payment != null) {
-                req.getSession().setAttribute("warning", "Vui lòng không spam");
+            if (payment == null) {
+                req.getSession().setAttribute("warning", "Đơn này không tồn tại trong hệ thống.");
+                resp.sendRedirect(req.getContextPath() + "/customer/bookings");
+                return;
+            }
+            if (payment.getTransactionStatus() != null){
+                req.getSession().setAttribute("warning", "Vui lòng không spam.");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
             }
@@ -170,12 +175,12 @@ public class PaymentController {
             }
             bookingDao.update(booking);
             payment.setBooking(booking);
-            paymentDao.update(payment);
             try {
                 payment.setPaid_at(Timestamp.valueOf(sqlFormatter.format(formatter.parse(paid_at))));
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+            paymentDao.update(payment);
             if (payment.transactionStatus != TransactionStatus.SUCCESS){
                 req.getSession().setAttribute("flash_success", "Thanh toán không thành công.");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");

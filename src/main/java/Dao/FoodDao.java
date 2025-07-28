@@ -16,23 +16,25 @@ public class FoodDao extends GenericDao<Food> {
                 .getResultList();
 
         if (foods.isEmpty()) return foods;
-        entityManager.createQuery(
-                        "SELECT f FROM Food f JOIN FETCH f.categories WHERE f IN :foods", Food.class)
+
+        foods = entityManager.createQuery(
+                        "SELECT DISTINCT f FROM Food f LEFT JOIN FETCH f.categories WHERE f IN :foods", Food.class)
                 .setParameter("foods", foods)
                 .getResultList();
 
-        entityManager.createQuery(
-                        "SELECT f FROM Food f JOIN FETCH f.allergyContents WHERE f IN :foods", Food.class)
+        foods = entityManager.createQuery(
+                        "SELECT DISTINCT f FROM Food f LEFT JOIN FETCH f.allergyContents WHERE f IN :foods", Food.class)
                 .setParameter("foods", foods)
                 .getResultList();
 
-        entityManager.createQuery(
-                        "SELECT f FROM Food f JOIN FETCH f.tastes WHERE f IN :foods", Food.class)
+        foods = entityManager.createQuery(
+                        "SELECT DISTINCT f FROM Food f LEFT JOIN FETCH f.tastes WHERE f IN :foods", Food.class)
                 .setParameter("foods", foods)
                 .getResultList();
 
         return foods;
     }
+
     public Food getFoodOfRestaurant(Restaurant restaurant, long foodId) {
         TypedQuery<Food> query = entityManager.createQuery("select f from Food f left join fetch f.categories where f.restaurant = :restaurant and f.id = : foodId", Food.class);
         query.setParameter("restaurant", restaurant);

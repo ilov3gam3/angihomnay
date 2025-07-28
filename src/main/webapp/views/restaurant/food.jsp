@@ -40,7 +40,7 @@
                 <td><%= food.getDescription() %></td>
                 <td><%= food.getPrice() %>đ</td>
                 <td>
-                    <img src="<%=request.getContextPath()%>/<%= food.getImage() %>" alt="food" width="80"/>
+                    <img src="<%= food.getImage() %>" alt="food" width="80"/>
                 </td>
                 <td>
                     <ul>
