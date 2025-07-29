@@ -115,7 +115,7 @@ public class PaymentController {
                 for (BookingDetail bookingDetail : bookingDetails) {
                     amount += (long) (bookingDetail.getFood().getPrice() * bookingDetail.getQuantity());
                 }
-                return amount;
+                return (long) (amount - booking.getPrePaidFee());
             }
         }
     }

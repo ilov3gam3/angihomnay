@@ -45,8 +45,8 @@
             <p><strong>Start:</strong> <%= booking.getStartTime() %></p>
             <p><strong>End:</strong> <%= booking.getEndTime() %></p>
             <p><strong>Note:</strong> <%= booking.getNote() %></p>
-            <p><strong>Prepaid:</strong> $<%= booking.getPrePaidFee() %></p>
-            <p><strong>Total:</strong> $<%= booking.getAmount() %></p>
+            <p><strong>Prepaid:</strong> <%= booking.getPrePaidFee() %> VND</p>
+            <p><strong>Total:</strong> <%= booking.getAmount() %> VND</p>
         </div>
 
         <div class="card shadow p-4 rounded-4 mb-4">

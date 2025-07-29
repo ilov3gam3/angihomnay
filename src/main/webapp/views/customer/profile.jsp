@@ -18,7 +18,7 @@
 <%
     Customer customer = (Customer) request.getAttribute("customer");
     List<Taste> tastes = new TasteDao().getAll();
-    List<Taste> userTastes = user.getFavoriteTastes().stream().toList();
+    List<Taste> userTastes = user.getFavoriteTastes() == null ? new ArrayList<>() : user.getFavoriteTastes().stream().toList();
 %>
 <main class="container py-5">
     <h2 class="mb-4">Trang cá nhân</h2>
@@ -110,7 +110,7 @@
                     <select class="form-select select2 select-allergies" name="allergies" multiple="multiple" style="width: 100%;">
                         <%
                             List<AllergyType> allAllergies = new AllergyTypeDao().getAll();
-                            Set<AllergyType> userAllergies = user.getAllergies();
+                            Set<AllergyType> userAllergies = user.getAllergies() == null ? new HashSet<>() : user.getAllergies();
                             for (AllergyType allergy : allAllergies) {
                                 boolean selected = userAllergies.contains(allergy);
                         %>

@@ -10,8 +10,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 public class FoodController {
@@ -186,6 +193,167 @@ public class FoodController {
             req.setAttribute("reviewDetails", reviewDetails);
             req.setAttribute("food", food);
             req.getRequestDispatcher("/views/public/food-detail.jsp").forward(req, resp);
+        }
+    }
+
+    @WebServlet("/api/ask-ai")
+    public static class AskAI extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String emotion = req.getParameter("emotion");
+            String hunger = req.getParameter("hunger");
+            String time = req.getParameter("time");
+            String tastes = req.getParameter("tastes");
+            String allergies = req.getParameter("allergies");
+
+            List<Food> foods = new FoodDao().getFoodsWithAllProperties();
+            JSONArray foodArray = convertFoodsToJson(foods);
+
+            // Chuẩn bị prompt gửi lên AI
+            StringBuilder userInfo = new StringBuilder("Thông tin người dùng:\n");
+
+            if (emotion != null && !emotion.isBlank()) {
+                userInfo.append("- Cảm xúc: ").append(emotion).append("\n");
+            }
+            if (hunger != null && !hunger.isBlank()) {
+                userInfo.append("- Mức độ đói: ").append(hunger).append("\n");
+            }
+            if (time != null && !time.isBlank()) {
+                userInfo.append("- Thời điểm ăn: ").append(time).append("\n");
+            }
+            if (tastes != null && !tastes.isBlank()) {
+                userInfo.append("- Sở thích: ").append(tastes).append("\n");
+            }
+            if (allergies != null && !allergies.isBlank()) {
+                userInfo.append("- Dị ứng: ").append(allergies).append("\n");
+            }
+
+// Nếu không có dòng nào, thì ghi là "Không có thông tin"
+            if (userInfo.toString().trim().equals("Thông tin người dùng:")) {
+                userInfo = new StringBuilder("Thông tin người dùng: Không có thông tin cụ thể.\n");
+            }
+
+            String prompt = String.format("""
+        Dưới đây là danh sách món ăn, mỗi món bao gồm: name, description, price, tastes (hương vị), allergyTypes (dị ứng):
+
+        %s
+
+        %s
+
+        Nhiệm vụ:
+        1. Phân tích tình trạng người dùng hiện tại, nên ăn món có đặc điểm như thế nào.
+        2. Trả về danh sách `id` của các món ăn phù hợp từ danh sách trên (tối đa 3, nếu không có món ăn nào thì trả về recommendedIds rỗng).
+
+        Yêu cầu kết quả:
+        {
+          "analysis": "Phân tích bằng tiếng Việt...",
+          "recommendedIds": [1, 5, 7]
+        }
+        """,
+                    foodArray.toString(2),
+                    userInfo.toString().trim()
+            );
+
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json");
+
+            try {
+                String aiResponse = askAI(prompt);
+                System.out.println(aiResponse);
+                resp.getWriter().write(aiResponse);
+            } catch (Exception e) {
+                e.printStackTrace();
+                resp.getWriter().write("{\"error\":\"Lỗi khi sử dụng AI\"}");
+            }
+        }
+
+        public static JSONArray convertFoodsToJson(List<Food> foods) {
+            JSONArray jsonArray = new JSONArray();
+            for (Food food : foods) {
+                JSONObject foodJson = new JSONObject();
+                foodJson.put("id", food.getId());
+                foodJson.put("name", food.getName());
+                foodJson.put("description", food.getDescription());
+                foodJson.put("price", food.getPrice());
+
+                JSONArray tasteArray = new JSONArray();
+                if (food.getTastes() != null) {
+                    for (Taste taste : food.getTastes()) {
+                        tasteArray.put(taste.getName());
+                    }
+                }
+                foodJson.put("tastes", tasteArray);
+
+                JSONArray allergyArray = new JSONArray();
+                if (food.getAllergyContents() != null) {
+                    for (AllergyType allergy : food.getAllergyContents()) {
+                        allergyArray.put(allergy.getName());
+                    }
+                }
+                foodJson.put("allergyTypes", allergyArray);
+
+                jsonArray.put(foodJson);
+            }
+            return jsonArray;
+        }
+
+        public String askAI(String promptText) throws Exception {
+            String apiKey = "AIzaSyAbobxuRAYZy7bfBTqgsLqUMRDsL12FDbc"; // Đổi API key tại đây
+//            String apiKey = "AIzaSyAHM3svzVsDVpvocf9r7glnk8sgaP6eXLY"; // Đổi API key tại đây
+            JSONObject payload = new JSONObject();
+            JSONArray contents = new JSONArray();
+            JSONArray parts = new JSONArray();
+            JSONObject textPart = new JSONObject();
+            textPart.put("text", promptText);
+            parts.put(textPart);
+            JSONObject content = new JSONObject();
+            content.put("parts", parts);
+            contents.put(content);
+            payload.put("contents", contents);
+
+//          String urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
+            String urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b-latest:generateContent";
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setRequestProperty("X-goog-api-key", apiKey);
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = payload.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != 200) {
+                throw new RuntimeException("Request failed: HTTP code " + responseCode);
+            }
+
+            StringBuilder responseStr = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    responseStr.append(responseLine.trim());
+                }
+            }
+
+            JSONObject responseBody = new JSONObject(responseStr.toString());
+            JSONArray candidates = responseBody.getJSONArray("candidates");
+            if (!candidates.isEmpty()) {
+                JSONObject firstCandidate = candidates.getJSONObject(0);
+                JSONObject contentObj = firstCandidate.getJSONObject("content");
+                JSONArray partsArray = contentObj.getJSONArray("parts");
+                String rawText = partsArray.getJSONObject(0).getString("text");
+
+                // Loại bỏ markdown nếu có
+                rawText = rawText.replace("```json", "").replace("```", "").trim();
+
+                return rawText;
+            }
+
+            return "{\"analysis\":\"Không có phản hồi từ AI\",\"recommendedIds\":[]}";
         }
     }
 }

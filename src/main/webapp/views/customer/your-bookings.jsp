@@ -54,10 +54,10 @@
                     <div class="card shadow p-4 rounded-4">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <% if (booking.getStatus() == BookingStatus.PENDING || booking.getStatus() != BookingStatus.CANCELLED && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())) { %>
-                                <a href="<%=request.getContextPath()%>/get-vnpay-url?id=<%=booking.getId()%>">
-                                    <button class="btn btn-success">Thanh toán</button>
-                                </a>
+                                <% if (booking.getStatus() == BookingStatus.PENDING && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())) { %>
+                                    <a href="<%=request.getContextPath()%>/get-vnpay-url?id=<%=booking.getId()%>">
+                                        <button class="btn btn-success">Thanh toán</button>
+                                    </a>
                                 <% } %>
                                 <a href="<%=request.getContextPath()%>/views/customer/booking-detail.jsp?id=<%=booking.getId()%>">
                                     <h5 class="fw-bold mb-2">Booking ID: <%= booking.getId() %></h5>
@@ -69,8 +69,8 @@
                                 <p class="mb-1"><strong>Note:</strong> <%= booking.getNote() %></p>
                             </div>
                             <div class="text-end">
-                                <p class="mb-1"><strong>Prepaid:</strong> $<%= booking.getPrePaidFee() %></p>
-                                <p class="mb-1"><strong>Total:</strong> $<%= booking.getAmount() %></p>
+                                <p class="mb-1"><strong>Prepaid:</strong> <%= booking.getPrePaidFee() %> VND</p>
+                                <p class="mb-1"><strong>Total:</strong> <%= booking.getAmount() %> VND</p>
                             </div>
                         </div>
 
@@ -111,7 +111,7 @@
                             %>
                             <li class="list-group-item d-flex justify-content-between">
                                 <div><%= detail.getFood().getName() %> x<%= detail.getQuantity() %></div>
-                                <div>$<%= detail.getPrice() %></div>
+                                <div><%= detail.getPrice() %>VND</div>
                             </li>
                             <%
                                 }

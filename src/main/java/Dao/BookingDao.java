@@ -2,6 +2,7 @@ package Dao;
 
 import Model.Booking;
 import Model.Constant.BookingStatus;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
@@ -38,11 +39,23 @@ public class BookingDao extends GenericDao<Booking> {
     }
 
     public void autocancelBooking() {
-        LocalDateTime thirtyMinAgo = LocalDateTime.now().minusMinutes(30);
-        entityManager.createQuery("update Booking b set b.status = :status where b.startTime = :startTime and b.status = 'PENDING'")
-                .setParameter("status", BookingStatus.CANCELLED)
-                .setParameter("startTime", thirtyMinAgo)
-                .executeUpdate();
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            tx.begin();
+
+            LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(30);
+            entityManager.createQuery(
+                            "UPDATE Booking b SET b.status = :status " +
+                                    "WHERE b.status = 'PENDING' AND b.startTime <= :timeLimit")
+                    .setParameter("status", BookingStatus.CANCELLED)
+                    .setParameter("timeLimit", timeLimit)
+                    .executeUpdate();
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+        }
     }
     public List<Booking> getByUserId(long userId) {
         TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b where b.customer.id = :userId", Booking.class);
