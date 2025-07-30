@@ -18,7 +18,7 @@ import java.util.Set;
 public class Food extends DistributedEntity {
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String name;
-    @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
+    @Column(nullable = false, columnDefinition = "NVARCHAR(3000)")
     private String description;
     private double price;
     private String image;

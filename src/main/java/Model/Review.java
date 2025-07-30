@@ -19,7 +19,7 @@ public class Review extends DistributedEntity{
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewDetail> reviewDetails;
-
+    @Column(columnDefinition = "NVARCHAR(1000)")
     private String comment;
     private int rating;
 }

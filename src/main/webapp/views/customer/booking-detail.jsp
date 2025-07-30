@@ -27,15 +27,13 @@
             Booking booking = new BookingDao().getById(Long.parseLong(request.getParameter("id")));
             if (booking != null) {
         %>
-        <% if (!BookingUtil.isBookingDone(booking)) { %>
-        <% if (booking.getStatus() != BookingStatus.CANCELLED && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())) {%>
+        <% if (booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT || booking.getStatus() == BookingStatus.DEPOSITED) {%>
         <button class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#foodModal" id="btnOpenFoodModal">Gọi thêm món</button>
-        <% if (booking.getStatus() != BookingStatus.COMPLETED) {%>
+        <% } %>
+        <% if (booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT || booking.getStatus() == BookingStatus.BOOKED) {%>
         <a href="<%=request.getContextPath()%>/get-vnpay-url?id=<%=booking.getId()%>">
             <button class="btn btn-success">Thanh toán</button>
         </a>
-        <% } %>
-        <% } %>
         <% } %>
 
         <div class="card shadow p-4 rounded-4 mb-4">
@@ -83,7 +81,7 @@
                 %>
                 <li class="list-group-item d-flex justify-content-between">
                     <div><%= detail.getFood().getName() %> x<%= detail.getQuantity() %></div>
-                    <div>$<%= detail.getPrice() %></div>
+                    <div><%= detail.getPrice() %>VND</div>
                 </li>
                 <% }
                 } else { %>
@@ -93,7 +91,7 @@
         </div>
 
         <%-- Nút Review --%>
-        <% if (booking.getStatus() == BookingStatus.COMPLETED && booking.getEndTime().isBefore(LocalDateTime.now())) { %>
+        <% if ((booking.getStatus() == BookingStatus.PAID || booking.getStatus() == BookingStatus.DEPOSITED) && booking.getEndTime().isBefore(LocalDateTime.now())) { %>
         <a href="<%= request.getContextPath() %>/customer/review?bookingId=<%= booking.getId() %>" class="btn btn-success me-2">Write Review</a>
         <% } %>
 
@@ -132,6 +130,13 @@
 <%@ include file="../common/reservation/footer.jsp" %>
 <%@ include file="../common/reservation/js.jsp" %>
 <script>
+    const foodModal = document.getElementById('foodModal');
+
+    foodModal.addEventListener('shown.bs.modal', function () {
+        const modalBody = foodModal.querySelector('.modal-body');
+        modalBody.style.maxHeight = '80vh';
+        modalBody.style.overflowY = 'auto';
+    });
     document.addEventListener("DOMContentLoaded", function () {
         const contextPath = '<%= request.getContextPath() %>';
         const restaurantId = '<%=booking.getTable().getRestaurant().getId()%>'; // hoặc bạn lấy từ booking.getTable().getRestaurant().getId() nếu cần động

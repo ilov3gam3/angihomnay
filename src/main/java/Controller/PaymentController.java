@@ -170,7 +170,11 @@ public class PaymentController {
             long booking_id = Long.parseLong(vnp_OrderInfo.split("\\|")[1]);
             Booking booking = bookingDao.getById(booking_id);
             if (payment.transactionStatus == TransactionStatus.SUCCESS){
-                booking.setStatus(BookingStatus.COMPLETED);
+                if (booking.getStatus() == BookingStatus.BOOKED){
+                    booking.setStatus(BookingStatus.DEPOSITED);
+                } else {
+                    booking.setStatus(BookingStatus.PAID);
+                }
                 booking.setAmount(payment.getAmount());
             }
             bookingDao.update(booking);

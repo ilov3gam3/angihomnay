@@ -235,7 +235,7 @@ public class FoodController {
             }
 
             String prompt = String.format("""
-        Dưới đây là danh sách món ăn, mỗi món bao gồm: name, description, price, tastes (hương vị), allergyTypes (dị ứng):
+        Dưới đây là danh sách món ăn, mỗi món bao gồm: id, name, price:
 
         %s
 
@@ -274,25 +274,7 @@ public class FoodController {
                 JSONObject foodJson = new JSONObject();
                 foodJson.put("id", food.getId());
                 foodJson.put("name", food.getName());
-                foodJson.put("description", food.getDescription());
                 foodJson.put("price", food.getPrice());
-
-                JSONArray tasteArray = new JSONArray();
-                if (food.getTastes() != null) {
-                    for (Taste taste : food.getTastes()) {
-                        tasteArray.put(taste.getName());
-                    }
-                }
-                foodJson.put("tastes", tasteArray);
-
-                JSONArray allergyArray = new JSONArray();
-                if (food.getAllergyContents() != null) {
-                    for (AllergyType allergy : food.getAllergyContents()) {
-                        allergyArray.put(allergy.getName());
-                    }
-                }
-                foodJson.put("allergyTypes", allergyArray);
-
                 jsonArray.put(foodJson);
             }
             return jsonArray;

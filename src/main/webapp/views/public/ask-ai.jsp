@@ -32,47 +32,49 @@
 
                 <!-- FORM bên trong box chat -->
                 <form id="aiSuggestionForm" class="p-3 border-top">
-                        <div class="form-group">
-                            <label for="emotion">Cảm xúc của bạn?</label>
-                            <input type="text" class="form-control" id="emotion" name="emotion" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="hunger">Mức độ đói?</label>
-                            <input type="text" class="form-control" id="hunger" name="hunger" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="time">Thời gian ăn?</label>
-                            <input type="text" class="form-control" id="time" name="time" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="emotion">Cảm xúc của bạn?</label>
+                        <input type="text" class="form-control" id="emotion" name="emotion" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hunger">Mức độ đói?</label>
+                        <input type="text" class="form-control" id="hunger" name="hunger" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Thời gian ăn?</label>
+                        <input type="text" class="form-control" id="time" name="time" required>
+                    </div>
 
-                        <% if (user != null) { %>
-                        <div class="form-group">
-                            <label>Dùng sở thích từ hồ sơ?</label><br>
-                            <input type="radio" name="useTastes" value="yes" checked> Có
-                            <input type="radio" name="useTastes" value="no"> Không
-                            <input type="text" class="form-control mt-2" id="tastesInput"
-                                   value="<%= user.getFavoriteTastes().stream().map(a -> a.getName()).collect(java.util.stream.Collectors.joining(", ")) %>" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Dùng dị ứng từ hồ sơ?</label><br>
-                            <input type="radio" name="useAllergies" value="yes" checked> Có
-                            <input type="radio" name="useAllergies" value="no"> Không
-                            <input type="text" class="form-control mt-2" id="allergiesInput"
-                                   value="<%= user.getAllergies().stream().map(a -> a.getName()).collect(java.util.stream.Collectors.joining(", ")) %>" disabled>
-                        </div>
-                        <% } else { %>
-                        <div class="form-group">
-                            <label>Sở thích món ăn</label>
-                            <input type="text" class="form-control" id="tastesInput" name="tastes">
-                        </div>
-                        <div class="form-group">
-                            <label>Dị ứng</label>
-                            <input type="text" class="form-control" id="allergiesInput" name="allergies">
-                        </div>
-                        <% } %>
+                    <% if (user != null) { %>
+                    <div class="form-group">
+                        <label>Dùng sở thích từ hồ sơ?</label><br>
+                        <input type="radio" name="useTastes" value="yes" checked> Có
+                        <input type="radio" name="useTastes" value="no"> Không
+                        <input type="text" class="form-control mt-2" id="tastesInput"
+                               value="<%= user.getFavoriteTastes().stream().map(a -> a.getName()).collect(java.util.stream.Collectors.joining(", ")) %>"
+                               disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Dùng dị ứng từ hồ sơ?</label><br>
+                        <input type="radio" name="useAllergies" value="yes" checked> Có
+                        <input type="radio" name="useAllergies" value="no"> Không
+                        <input type="text" class="form-control mt-2" id="allergiesInput"
+                               value="<%= user.getAllergies().stream().map(a -> a.getName()).collect(java.util.stream.Collectors.joining(", ")) %>"
+                               disabled>
+                    </div>
+                    <% } else { %>
+                    <div class="form-group">
+                        <label>Sở thích món ăn</label>
+                        <input type="text" class="form-control" id="tastesInput" name="tastes">
+                    </div>
+                    <div class="form-group">
+                        <label>Dị ứng</label>
+                        <input type="text" class="form-control" id="allergiesInput" name="allergies">
+                    </div>
+                    <% } %>
 
-                        <button type="submit" class="btn btn-success mt-3">Gửi</button>
-                    </form>
+                    <button type="submit" class="btn btn-success mt-3">Gửi</button>
+                </form>
             </div>
             <div id="wheel" style="display: none">B</div>
         </div>
@@ -156,28 +158,52 @@
         if (document.getElementsByName("useAllergies").length > 0) {
             setupRadioToggle("useAllergies", "allergiesInput", document.getElementById("allergiesInput").value);
         }
-
         form.addEventListener("submit", function (e) {
             e.preventDefault();
 
             const params = new URLSearchParams(new FormData(form)).toString();
 
-            // Show user message
             appendChat("👤", "Đang gửi yêu cầu...");
 
             fetch("<%=request.getContextPath()%>/api/ask-ai?" + params)
                 .then(response => response.text())
                 .then(data => {
-                    appendChat("🤖", data);
-                }).catch(error => {
-                appendChat("🤖", "Đã xảy ra lỗi!");
-            });
+                    let parsed;
+
+                    // Cố gắng parse JSON (AI có thể trả thừa dấu ```json, v.v.)
+                    try {
+                        const cleaned = data.replace(/```json|```/g, "").trim();
+                        parsed = JSON.parse(cleaned);
+                    } catch (err) {
+                        appendChat("🤖", "❌ Phản hồi từ AI không hợp lệ.");
+                        console.error("JSON parse error:", err);
+                        return;
+                    }
+
+                    const analysis = parsed.analysis || "Không có phân tích.";
+                    const ids = parsed.recommendedIds || [];
+
+                    appendChat("🤖", `<p>\${analysis}</p>`);
+
+                    if (ids.length > 0) {
+                        const linksHtml = ids.map(id =>
+                            `<a href="<%=request.getContextPath()%>/food-detail?id=\${id}" class="btn btn-outline-primary btn-sm m-1">Xem món #\${id}</a>`
+                        ).join("");
+                        appendChat("🤖", `<div>Gợi ý món ăn phù hợp:<br>\${linksHtml}</div>`);
+                    } else {
+                        appendChat("🤖", "Không có món ăn nào được gợi ý.");
+                    }
+                })
+                .catch(error => {
+                    appendChat("🤖", "Đã xảy ra lỗi!");
+                    console.error(error);
+                });
         });
 
         function appendChat(sender, message) {
             const div = document.createElement("div");
-            div.className = "mb-2";
-            div.innerHTML = `<strong>\${sender}</strong>: \${message}`;
+            div.className = "mb-3";
+            div.innerHTML = `<strong>\${sender}</strong>:<br>\${message}`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }

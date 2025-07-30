@@ -16,6 +16,7 @@ public class ReviewDetail extends DistributedEntity{
     @ManyToOne
     @JoinColumn(name = "review_id")
     private Review review;
+    @Column(columnDefinition = "NVARCHAR(1000)")
     private String comment;
     private int rating;
 }

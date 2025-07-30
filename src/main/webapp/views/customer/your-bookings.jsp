@@ -31,10 +31,13 @@
         <div class="text-center mb-4">
             <div class="btn-group" role="group" aria-label="Booking filters">
                 <button type="button" class="btn btn-outline-primary filter-btn active" data-filter="ALL">Tất cả</button>
-                <button type="button" class="btn btn-outline-primary filter-btn" data-filter="ONGOING">Đang diễn ra</button>
-                <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="PENDING">Đang chờ</button>
-                <button type="button" class="btn btn-outline-danger filter-btn" data-filter="CANCELLED">Đã huỷ</button>
-                <button type="button" class="btn btn-outline-success filter-btn" data-filter="COMPLETED">Đã xong</button>
+                <button type="button" class="btn btn-outline-primary filter-btn" data-filter="BOOKED">Đã đặt (chưa thanh toán)</button>
+                <button type="button" class="btn btn-outline-primary filter-btn" data-filter="DEPOSITED">Đã thanh toán cọc</button>
+                <button type="button" class="btn btn-outline-primary filter-btn" data-filter="ONGOING">Đang diễn ra</button>
+                <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="WAITING_FINAL_PAYMENT">Chờ thanh toán</button>
+                <button type="button" class="btn btn-outline-danger filter-btn" data-filter="PAID">Đã thanh toán</button>
+                <button type="button" class="btn btn-outline-success filter-btn" data-filter="CANCELED">Đã hủy</button>
+                <button type="button" class="btn btn-outline-success filter-btn" data-filter="NO_SHOW">Không xuất hiện</button>
             </div>
         </div>
         <div class="row">
@@ -43,8 +46,9 @@
                 if (bookings != null && !bookings.isEmpty()) {
                     for (Model.Booking booking : bookings) {
                         String status;
-                        if (booking.getStatus() != BookingStatus.CANCELLED && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())){
-                            status = "ONGOING";
+                        //&& booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())
+                        if ((booking.getStatus() == BookingStatus.DEPOSITED || booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT) && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())){
+                            status = booking.getStatus() + ",ONGOING";
                         } else {
                             status = booking.getStatus().toString();
                         }
@@ -54,7 +58,7 @@
                     <div class="card shadow p-4 rounded-4">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <% if (booking.getStatus() == BookingStatus.PENDING && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())) { %>
+                                <% if (booking.getStatus() == BookingStatus.BOOKED || booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT) { %>
                                     <a href="<%=request.getContextPath()%>/get-vnpay-url?id=<%=booking.getId()%>">
                                         <button class="btn btn-success">Thanh toán</button>
                                     </a>
@@ -120,7 +124,7 @@
                             <li class="list-group-item text-muted">No food items.</li>
                             <% } %>
                         </ul>
-                        <% if (booking.getStatus() == BookingStatus.COMPLETED && booking.getEndTime().isBefore(LocalDateTime.now())) {%>
+                        <% if ((booking.getStatus() == BookingStatus.DEPOSITED || booking.getStatus() == BookingStatus.PAID) && booking.getEndTime().isBefore(LocalDateTime.now())) {%>
                         <a href="<%=request.getContextPath()%>/customer/review?bookingId=<%=booking.getId()%>">
                             <button class="btn btn-success">Review</button>
                         </a>
@@ -179,8 +183,8 @@
 
             // Duyệt tất cả booking và ẩn/hiện theo trạng thái
             document.querySelectorAll('.booking-item').forEach(item => {
-                const status = item.getAttribute('data-status');
-                if (filter === 'ALL' || status === filter) {
+                const statusList = item.getAttribute('data-status').split(',');
+                if (filter === 'ALL' || statusList.includes(filter)) {
                     item.style.display = '';
                 } else {
                     item.style.display = 'none';

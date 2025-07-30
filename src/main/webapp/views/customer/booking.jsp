@@ -49,13 +49,30 @@
                     <img src="<%=request.getContextPath()%>/assets/reservation/img/chef.png" width="400" height="733" alt="" class="img-fluid">
                 </div>
                 <div class="col-12 col-md-7" data-cue="slideInUp">
+                    <%
+                        String flashSuccess = (String) session.getAttribute("flash_success");
+                        String flashError = (String) session.getAttribute("flash_error");
+                        session.removeAttribute("flash_success");
+                        session.removeAttribute("flash_error");
+                    %>
+                    <%if (flashSuccess != null) {%>
+                    <div class="alert alert-success" role="alert">
+                        <%=flashSuccess%>
+                    </div>
+                    <%}%>
+                    <%if (flashError != null) {%>
+                    <div class="alert alert-danger" role="alert">
+                        <%=flashError%>
+                    </div>
+                    <%}%>
+
                     <div class="main_title">
                         <span><em></em></span>
                         <h2>Reserve a table</h2>
                         <p>or Call us at 0344 32423453</p>
                     </div>
                     <div id="wizard_container">
-                        <form id="bookingHiddenForm" action="<%=request.getContextPath()%>/customer/book" method="POST" style="display: none;">
+                        <form id="bookingHiddenForm" action="<%=request.getContextPath()%>/customer/book" method="post" style="display: none;">
                             <input type="hidden" name="datepicker_field" id="hidden_date">
                             <input type="hidden" name="restaurantId" id="hidden_restaurant">
                             <input type="hidden" name="startTime" id="hidden_start_time">
@@ -71,7 +88,7 @@
                                     <div class="form-group">
                                         <input type="hidden" name="datepicker_field" id="datepicker_field" class="required">
                                     </div>
-                                    <div id="DatePicker"></div>
+                                    <div id="mydatepicker"></div>
                                 </div>
                                 <!-- /step-->
                                 <div class="step">
@@ -152,16 +169,18 @@
 <script>
     $("#mydatepicker").datepicker({
         dateFormat: "yy-mm-dd", // hoặc format bạn muốn
-        minDate: 0, // <== đây là dòng quan trọng: chặn từ hôm nay trở về trước
+        minDate: 1, // <== đây là dòng quan trọng: chặn từ hôm nay trở về trước
         beforeShowDay: function(date) {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // reset giờ để so chính xác
-
             if (date < today) {
                 return [false, "", "Ngày đã qua"]; // không cho chọn
             }
-
             return [true]; // cho chọn các ngày khác
+        },
+        onSelect: function(dateText) {
+            // Gán giá trị được chọn vào input hidden
+            $("#datepicker_field").val(dateText);
         }
     });
 </script>
@@ -318,8 +337,8 @@
 
         // 1. Binding ngày
         const rawDate = document.getElementById("datepicker_field").value;
-        const isoDate = formatDateToISO(rawDate); // yyyy-MM-dd
-        document.getElementById("hidden_date").value = isoDate;
+        const isoDate = document.getElementById("datepicker_field").value;
+        document.getElementById("hidden_date").value = isoDate
 
         // 2. Binding nhà hàng
         const resId = document.getElementById("restaurantSelect").value;

@@ -3,6 +3,7 @@ package Controller;
 import Dao.*;
 import Model.*;
 import Model.Constant.BookingStatus;
+import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -57,7 +58,7 @@ public class BookingController {
             Booking booking;
             if (foodIds.isEmpty()){
                 long prePaidFee = 100000;
-                booking = new Booking(customer, restaurantTable, startTime, endTime, prePaidFee, note, 0L, BookingStatus.PENDING);
+                booking = new Booking(customer, restaurantTable, startTime, endTime, prePaidFee, note, 0L, BookingStatus.BOOKED);
                 bookingDao.save(booking);
             } else {
                 // lọc ra các món có số lượng > 0
@@ -81,7 +82,7 @@ public class BookingController {
                     resp.sendRedirect(req.getHeader("referer"));
                     return;
                 }
-                booking = new Booking(customer, restaurantTable, startTime, endTime, 0, note, 0, BookingStatus.PENDING);
+                booking = new Booking(customer, restaurantTable, startTime, endTime, 0, note, 0, BookingStatus.BOOKED);
                 bookingDao.save(booking);
 
                 long prePaidFee = 0;
@@ -189,8 +190,7 @@ public class BookingController {
                 }
             }
 
-            // Cập nhật trạng thái booking về PENDING nếu cần
-            booking.setStatus(BookingStatus.PENDING);
+            booking.setStatus(BookingStatus.WAITING_FINAL_PAYMENT);
             bookingDao.update(booking);
 
             req.getSession().setAttribute("flash_success", "Gọi thêm món thành công.");
@@ -206,6 +206,82 @@ public class BookingController {
             List<Booking> bookings = bookingDao.getByUserId(user.getId());
             req.setAttribute("bookings", bookings);
             req.getRequestDispatcher("/views/customer/your-bookings.jsp").forward(req, resp);
+        }
+    }
+
+    @WebServlet("/restaurant/bookings")
+    public static class RestaurantBookingServlet extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            RestaurantDao restaurantDao = new RestaurantDao();
+            BookingDao bookingDao = new BookingDao();
+            User user = (User) req.getSession().getAttribute("user");
+            Restaurant restaurant = restaurantDao.getById(user.getId());
+            List<Booking> bookings = bookingDao.getBookingByResId(restaurant.getId());
+            req.setAttribute("bookings", bookings);
+            req.getRequestDispatcher("/views/restaurant/bookings.jsp").forward(req, resp);
+        }
+    }
+
+    @WebServlet("/restaurant/cancel")
+    public static class RestaurantCancel extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
+            BookingDao bookingDao = new BookingDao();
+            Booking booking = bookingDao.getById(id);
+            if (booking == null){
+                req.getSession().setAttribute("flash_error", "Booking không tồn tại.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            booking.setStatus(BookingStatus.CANCELED);
+            bookingDao.update(booking);
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/restaurant/no-show")
+    public static class RestaurantNoShow extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
+            BookingDao bookingDao = new BookingDao();
+            Booking booking = bookingDao.getById(id);
+            if (booking == null){
+                req.getSession().setAttribute("flash_error", "Booking không tồn tại.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            booking.setStatus(BookingStatus.NO_SHOW);
+            bookingDao.update(booking);
+            resp.sendRedirect(req.getHeader("referer"));
+        }
+    }
+
+    @WebServlet("/api/revenue-statistics")
+    public static class RevenueStatisticsServlet extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            resp.setContentType("application/json");
+            String role = req.getParameter("role");
+            BookingDao bookingDao = new BookingDao(); // giả sử bạn đã có DAO này
+            if ("restaurant".equals(role)) {
+                int startWeek = Integer.parseInt(req.getParameter("startWeek"));
+                int endWeek = Integer.parseInt(req.getParameter("endWeek"));
+                long restaurantId = Long.parseLong(req.getParameter("restaurantId")); // từ session hoặc request
+
+                List<Map<String, Object>> data = bookingDao.getWeeklyRevenue(restaurantId, startWeek, endWeek);
+                resp.getWriter().write(new Gson().toJson(data));
+
+            } else if ("admin".equals(role)) {
+                int month = Integer.parseInt(req.getParameter("month"));
+                int year = Integer.parseInt(req.getParameter("year"));
+
+                List<Map<String, Object>> data = bookingDao.getMonthlyRevenueByRestaurant(month, year);
+                resp.getWriter().write(new Gson().toJson(data));
+            }
         }
     }
 }

@@ -24,6 +24,7 @@ public class Booking extends DistributedEntity {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private double prePaidFee;
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String note;
     private double amount;
 
