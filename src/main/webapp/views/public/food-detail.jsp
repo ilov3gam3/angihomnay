@@ -24,7 +24,7 @@
 <% Food food = (Food) request.getAttribute("food");%>
 <% List<ReviewDetail> reviewDetails = (List<ReviewDetail>) request.getAttribute("reviewDetails"); %>
 <main>
-    <div class="hero_single inner_pages background-image" data-background="url(<%=request.getContextPath()%>/assets/reservation/img/hero_menu.jpg)">
+    <div class="hero_single inner_pages background-image" data-background="url(<%=request.getContextPath()%>/assets/reservation/img/slides/slide_home_1.jpg)">
         <div class="opacity-mask" data-opacity-mask="rgba(0, 0, 0, 0.6)">
             <div class="container">
                 <div class="row justify-content-center">
@@ -58,23 +58,23 @@
                     <span class="rating"><%=avg%><i class="icon_star voted"></i><em><%=reviewDetails.size()%> reviews</em></span>
                     <h1><%=food.getName()%></h1>
                     <p><%=food.getDescription()%></p>
-                    <div class="prod_options">
-                        <div class="row">
-                            <label class="col-xl-5 col-lg-5  col-md-6 col-6"><strong>Quantity</strong></label>
-                            <div class="col-xl-4 col-lg-5 col-md-6 col-6">
-                                <div class="numbers-row">
-                                    <input type="text" value="1" id="quantity_1" class="qty2" name="quantity_1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<%--                    <div class="prod_options">--%>
+<%--                        <div class="row">--%>
+<%--                            <label class="col-xl-5 col-lg-5  col-md-6 col-6"><strong>Quantity</strong></label>--%>
+<%--                            <div class="col-xl-4 col-lg-5 col-md-6 col-6">--%>
+<%--                                <div class="numbers-row">--%>
+<%--                                    <input type="text" value="1" id="quantity_1" class="qty2" name="quantity_1">--%>
+<%--                                </div>--%>
+<%--                            </div>--%>
+<%--                        </div>--%>
+<%--                    </div>--%>
                     <div class="row">
                         <div class="col-lg-5 col-md-6">
                             <div class="price_main"><span class="new_price"><%=food.getPrice()%> VND</span></div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="btn_add_to_cart"><a href="#0" class="btn_1D">Đặt bàn với món này</a></div>
-                        </div>
+<%--                        <div class="col-lg-4 col-md-6">--%>
+<%--                            <div class="btn_add_to_cart"><a href="#0" class="btn_1D">Đặt bàn với món này</a></div>--%>
+<%--                        </div>--%>
                     </div>
                 </div>
                 <!-- /prod_info -->
@@ -92,6 +92,9 @@
                 </li>
                 <li class="nav-item">
                     <a id="tab-B" href="#pane-B" class="nav-link" data-bs-toggle="tab" role="tab">Reviews</a>
+                </li>
+                <li class="nav-item">
+                    <a id="tab-C" href="#pane-C" class="nav-link" data-bs-toggle="tab" role="tab">Địa chỉ nhà hàng</a>
                 </li>
             </ul>
         </div>
@@ -169,6 +172,11 @@
                             <% } %>
                         </div>
                         <!-- /card-body -->
+                    </div>
+                </div>
+                <div id="pane-C" class="card tab-pane fade" role="tabpanel" aria-labelledby="tab-C">
+                    <div class="col-12 row">
+                        <%=food.getRestaurant().getMapEmbedUrl()%>
                     </div>
                 </div>
             </div>

@@ -21,12 +21,18 @@
             <% if (user != null && user.getRole() == Role.ADMIN) { %>
             <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/admin/user">Quản lý người dùng</a>
             </li>
-            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/admin/categories">Quản lý loại món
-                ăn</a></li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/admin/categories">Quản lý loại món ăn</a>
+            </li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/views/admin/revenue.jsp">Thống kê</a>
+            </li>
             <% } else if (user != null && user.getRole() == Role.RESTAURANT) { %>
             <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/restaurant/foods">Quản lý món ăn</a>
             </li>
             <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/restaurant/tables">Quản lý bàn</a>
+            </li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/views/restaurant/revenue.jsp">Thống kê</a>
+            </li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/restaurant/bookings">Đơn đặt bàn</a>
             </li>
             <% } else { %>
             <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/customer/book">Đặt bàn ngay</a>

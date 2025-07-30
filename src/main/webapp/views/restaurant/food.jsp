@@ -1,24 +1,36 @@
 <%@ page import="java.util.List" %>
-<%@ page import="Model.Category, Model.Food" %>
-<%@ page import="Model.Category" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
+
+<!-- Mirrored from www.ansonika.com/foores/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 24 Jul 2025 13:51:43 GMT -->
 <head>
-    <title>AnGiHomNay - Món ăn</title>
-    <%@include file="../common/head.jsp" %>
+    <title>Foores - Single Restaurant Version</title>
+    <%@include file="../common/reservation/head.jsp"%>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
+
 <body>
-<%@include file="../common/header.jsp" %>
 
-<main>
-    <section class="recommendations">
-        <h3>Danh sách Món ăn</h3>
-        <button data-bs-toggle="modal" data-bs-target="#create_modal" class="btn-register m-1">Thêm món ăn mới</button>
+<div id="preloader">
+    <div data-loader="circle-side"></div>
+</div><!-- /Page Preload -->
 
-        <% List<Food> foods = (List<Food>) request.getAttribute("foods"); %>
-        <table class="nutrition-table">
-            <thead>
+<%@include file="../common/reservation/header.jsp"%>
+<!-- /header -->
+
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Danh sách Món ăn</h3>
+        <button data-bs-toggle="modal" data-bs-target="#create_modal" class="btn btn-primary">Thêm món ăn mới</button>
+    </div>
+
+    <% List<Food> foods = (List<Food>) request.getAttribute("foods"); %>
+    <% if (foods != null && !foods.isEmpty()) { %>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
             <tr>
                 <th>ID</th>
                 <th>Tên</th>
@@ -40,31 +52,33 @@
                 <td><%= food.getDescription() %></td>
                 <td><%= food.getPrice() %>đ</td>
                 <td>
-                    <img src="<%= food.getImage() %>" alt="food" width="80"/>
+                    <img src="<%= food.getImage() %>" alt="food" width="80" class="img-thumbnail"/>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="mb-0 ps-3">
                         <% for (Category c : food.getCategories()) { %>
                         <li><%= c.getName() %></li>
                         <% } %>
                     </ul>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="mb-0 ps-3">
                         <% for (Taste t : food.getTastes()) { %>
                         <li><%= t.getName() %></li>
                         <% } %>
                     </ul>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="mb-0 ps-3">
                         <% for (AllergyType a : food.getAllergyContents()) { %>
                         <li><%= a.getName() %></li>
                         <% } %>
                     </ul>
                 </td>
                 <td>
-                    <%=food.isAvailable() ? "Có": "Không"%>
+                        <span class="badge bg-<%= food.isAvailable() ? "success" : "secondary" %>">
+                            <%= food.isAvailable() ? "Có" : "Không" %>
+                        </span>
                 </td>
                 <td>
                     <button
@@ -87,10 +101,11 @@
             <% } %>
             </tbody>
         </table>
-    </section>
+    </div>
+    <% } else { %>
+    <div class="alert alert-info">Chưa có món ăn nào trong hệ thống.</div>
+    <% } %>
 </main>
-
-<!-- Create Modal -->
 <%
     List<Category> categories = (List<Category>) request.getAttribute("categories");
 %>
@@ -110,7 +125,7 @@
 
                     <div class="form-group">
                         <label for="description">Mô tả</label>
-                        <textarea name="description" id="description" class="form-control" required></textarea>
+                        <textarea name="description" id="description" class="form-control" style="height: 200px;" required></textarea>
                     </div>
 
                     <div class="form-group">
@@ -160,7 +175,6 @@
         </div>
     </div>
 </div>
-<%-- Update Modal--%>
 <div class="modal fade" id="update_modal" tabindex="-1" aria-labelledby="updateLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -180,7 +194,7 @@
 
                     <div class="form-group">
                         <label for="edit_description">Mô tả</label>
-                        <textarea name="description" id="edit_description" class="form-control" required></textarea>
+                        <textarea name="description" id="edit_description" class="form-control" style="height: 200px;" required></textarea>
                     </div>
 
                     <div class="form-group">
@@ -192,7 +206,7 @@
                         <label for="edit_image">Cập nhật ảnh mới (nếu cần)</label>
                         <input type="file" name="image" id="edit_image" accept="image/*" class="form-control">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="edit_available">Khả dụng</label>
                         <select name="available" id="edit_available" class="form-control">
@@ -203,7 +217,7 @@
 
                     <div class="form-group">
                         <label for="edit_categoryIds">Danh mục</label>
-                        <select class="form-control js-example-basic-multiple" id="edit_categoryIds" name="categoryIds" multiple="multiple">
+                        <select class="form-control js-example-basic-multiple-update" id="edit_categoryIds" name="categoryIds" multiple="multiple">
                             <% for (Category category : categories) { %>
                             <option value="<%= category.getId() %>"><%= category.getName() %></option>
                             <% } %>
@@ -212,7 +226,7 @@
 
                     <div class="form-group">
                         <label for="edit_tasteIds">Khẩu vị</label>
-                        <select class="form-control js-example-basic-multiple" id="edit_tasteIds" name="tasteIds" multiple="multiple">
+                        <select class="form-control js-example-basic-multiple-update" id="edit_tasteIds" name="tasteIds" multiple="multiple">
                             <% for (Taste taste : tastes) { %>
                             <option value="<%= taste.getId() %>"><%= taste.getName() %></option>
                             <% } %>
@@ -221,7 +235,7 @@
 
                     <div class="form-group">
                         <label for="edit_allergyIds">Thành phần dị ứng</label>
-                        <select class="form-control js-example-basic-multiple" id="edit_allergyIds" name="allergyIds" multiple="multiple">
+                        <select class="form-control js-example-basic-multiple-update" id="edit_allergyIds" name="allergyIds" multiple="multiple">
                             <% for (AllergyType allergy : allergies) { %>
                             <option value="<%= allergy.getId() %>"><%= allergy.getName() %></option>
                             <% } %>
@@ -236,16 +250,49 @@
         </div>
     </div>
 </div>
-<%@include file="../common/foot.jsp" %>
-<%@include file="../common/js.jsp" %>
+<!-- /main -->
 
-<!-- Select2 init -->
+<%@include file="../common/reservation/footer.jsp"%>
+<!--/footer-->
+
+<div id="toTop"></div><!-- Back to top button -->
+
+<!-- Modal terms -->
+<div class="modal fade" id="terms-txt" tabindex="-1" role="dialog" aria-labelledby="termsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="termsLabel">Terms and conditions</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in <strong>nec quod novum accumsan</strong>, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus. Lorem ipsum dolor sit amet, <strong>in porro albucius qui</strong>, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+                <p>Lorem ipsum dolor sit amet, in porro albucius qui, in nec quod novum accumsan, mei ludus tamquam dolores id. No sit debitis meliore postulant, per ex prompta alterum sanctus, pro ne quod dicunt sensibus.</p>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<%@include file="../common/reservation/js.jsp"%>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</body>
 <script>
     $(document).ready(function () {
         $('.js-example-basic-multiple').select2({
             placeholder: "Chọn danh mục cho món ăn",
             width: '100%',
             dropdownParent: $('#create_modal')
+        });
+    });
+    $(document).ready(function () {
+        $('.js-example-basic-multiple-update').select2({
+            placeholder: "Chọn danh mục cho món ăn",
+            width: '100%',
+            dropdownParent: $('#update_modal')
         });
     });
     function populateEditForm(button) {
@@ -276,6 +323,5 @@
         $select.val(categoryIds).trigger('change'); // set selected
     }
 </script>
-
-</body>
+<!-- Mirrored from www.ansonika.com/foores/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 24 Jul 2025 13:51:44 GMT -->
 </html>

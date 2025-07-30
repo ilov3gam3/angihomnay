@@ -88,7 +88,14 @@ public class UserController {
                 cookie.setPath(req.getContextPath());
                 resp.addCookie(cookie);
             }
-
+            if (user.getRole() == Role.RESTAURANT) {
+                resp.sendRedirect(req.getContextPath() + "/views/restaurant/revenue.jsp");
+                return;
+            }
+            if (user.getRole() == Role.ADMIN) {
+                resp.sendRedirect(req.getContextPath() + "/views/admin/revenue.jsp");
+                return;
+            }
             resp.sendRedirect(req.getContextPath() + "/");
         }
     }

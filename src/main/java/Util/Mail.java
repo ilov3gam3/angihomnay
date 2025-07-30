@@ -9,6 +9,7 @@ import java.util.Properties;
 
 public class Mail {
     public static boolean send(String mail_to,String subject, String html){
+        System.out.println("in send mail func");
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");

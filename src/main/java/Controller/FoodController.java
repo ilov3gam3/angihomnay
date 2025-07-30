@@ -338,4 +338,40 @@ public class FoodController {
             return "{\"analysis\":\"Không có phản hồi từ AI\",\"recommendedIds\":[]}";
         }
     }
+
+    @WebServlet("/api/get-all-food")
+    public static class GetAllFoodServlet extends HttpServlet{
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            List<Food> foods = new FoodDao().getAll();
+            JSONArray jsonArray = new JSONArray();
+
+            for (Food food : foods) {
+                JSONObject jsonFood = new JSONObject();
+                jsonFood.put("id", food.getId());
+                jsonFood.put("name", food.getName());
+                jsonFood.put("description", food.getDescription());
+                jsonFood.put("price", food.getPrice());
+                jsonFood.put("image", food.getImage());
+                jsonFood.put("isAvailable", food.isAvailable());
+
+                // Add categories
+                JSONArray jsonCategories = new JSONArray();
+                if (food.getCategories() != null) {
+                    for (Category category : food.getCategories()) {
+                        JSONObject jsonCategory = new JSONObject();
+                        jsonCategory.put("id", category.getId());
+                        jsonCategory.put("name", category.getName());
+                        jsonCategories.put(jsonCategory);
+                    }
+                }
+                jsonFood.put("categories", jsonCategories);
+
+                jsonArray.put(jsonFood);
+            }
+            resp.getWriter().write(jsonArray.toString());
+        }
+    }
 }

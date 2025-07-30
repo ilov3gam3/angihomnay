@@ -24,17 +24,17 @@
         <div id="restaurantSection" class="mb-4">
             <div class="row mb-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label">Tuần bắt đầu</label>
+                    <label class="form-label">Tuần bắt đầu <small id="startWeekRange" class="form-text text-muted"></small></label>
                     <input class="form-control" type="number" id="startWeek" min="1" max="52">
-                    <small id="startWeekRange" class="form-text text-muted"></small>
+
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Tuần kết thúc</label>
+                    <label class="form-label">Tuần kết thúc <small id="endWeekRange" class="form-text text-muted"></small></label>
                     <input class="form-control" type="number" id="endWeek" min="1" max="52">
-                    <small id="endWeekRange" class="form-text text-muted"></small>
+
                 </div>
                 <div class="col-md-4">
-                    <button id="loadRestaurantRevenue" class="btn btn-success w-100">Xem doanh thu</button>
+                    <button id="loadRestaurantRevenue" class="btn btn-success btn-lg h-100 w-100">Xem doanh thu</button>
                 </div>
             </div>
             <canvas id="restaurantChart" height="100"></canvas>

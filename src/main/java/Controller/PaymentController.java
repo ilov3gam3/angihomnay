@@ -10,6 +10,7 @@ import Model.Constant.PaymentType;
 import Model.Constant.TransactionStatus;
 import Model.Payment;
 import Util.Config;
+import Util.Mail;
 import Util.VNPayUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,6 +25,9 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class PaymentController {
     @WebServlet("/get-vnpay-url")
@@ -93,10 +97,10 @@ public class PaymentController {
             String vnp_SecureHash = VNPayUtil.hmacSHA512(Config.secretKey, hashData.toString());
             queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
             Payment payment = new Payment();
-            payment.setAmount(amount/100);
+            payment.setAmount(amount / 100);
             payment.setTxnRef(vnp_TxnRef);
             payment.setOrderInfo(vnp_OrderInfo);
-            if (booking.getAmount() == 0 && booking.getPrePaidFee() != 0){
+            if (booking.getAmount() == 0 && booking.getPrePaidFee() != 0) {
                 payment.setType(PaymentType.DEPOSIT);
             } else {
                 payment.setType(PaymentType.FINAL);
@@ -105,8 +109,9 @@ public class PaymentController {
             String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
             resp.sendRedirect(paymentUrl);
         }
-        public static long getAmount(Booking booking){
-            if (booking.getPayments().isEmpty()){ // thanh toàn đặt bàn
+
+        public static long getAmount(Booking booking) {
+            if (booking.getPayments().isEmpty()) { // thanh toàn đặt bàn
                 return (long) booking.getPrePaidFee();
             } else { // thanh toán gọi thêm món
                 long amount = 0;
@@ -137,7 +142,7 @@ public class PaymentController {
             fields.remove("vnp_SecureHashType");
             fields.remove("vnp_SecureHash");
             String signValue = VNPayUtil.hashAllFields(fields);
-            if (!signValue.equals(req.getParameter("vnp_SecureHash"))){
+            if (!signValue.equals(req.getParameter("vnp_SecureHash"))) {
                 req.getSession().setAttribute("flash_error", "Mã băm không khớp");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
@@ -152,7 +157,7 @@ public class PaymentController {
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
             }
-            if (payment.getTransactionStatus() != null){
+            if (payment.getTransactionStatus() != null) {
                 req.getSession().setAttribute("warning", "Vui lòng không spam.");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
@@ -169,8 +174,8 @@ public class PaymentController {
             payment.setBankTranNo(vnp_BankTranNo);
             long booking_id = Long.parseLong(vnp_OrderInfo.split("\\|")[1]);
             Booking booking = bookingDao.getById(booking_id);
-            if (payment.transactionStatus == TransactionStatus.SUCCESS){
-                if (booking.getStatus() == BookingStatus.BOOKED){
+            if (payment.transactionStatus == TransactionStatus.SUCCESS) {
+                if (booking.getStatus() == BookingStatus.BOOKED) {
                     booking.setStatus(BookingStatus.DEPOSITED);
                 } else {
                     booking.setStatus(BookingStatus.PAID);
@@ -185,13 +190,128 @@ public class PaymentController {
                 throw new RuntimeException(e);
             }
             paymentDao.update(payment);
-            if (payment.transactionStatus != TransactionStatus.SUCCESS){
+            if (payment.transactionStatus != TransactionStatus.SUCCESS) {
                 req.getSession().setAttribute("flash_success", "Thanh toán không thành công.");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
             }
-            req.getSession().setAttribute("success", "Thanh toán thành công.");
+            String email = booking.getCustomer().getUser().getEmail();
+            System.out.println("Sending to: " + email);
+            String html = generateHtml(booking);
+            System.out.println(html);
+            // send mail
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(() -> {
+                try {
+                    Mail.send(email, "Hóa đơn của bạn.", html);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            executorService.shutdown();
+            try {
+                executorService.awaitTermination(10, TimeUnit.SECONDS); // Đợi thread chạy xong
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // end send mail
+            req.getSession().setAttribute("flash_success", "Thanh toán thành công.");
             resp.sendRedirect(req.getContextPath() + "/customer/bookings");
+        }
+
+        private String generateHtml(Booking booking) {
+            return String.format("""
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="UTF-8">
+                                <title>Booking Details</title>
+                            </head>
+                            <body style="font-family: Arial, sans-serif; color: #333; background: #f9f9f9; padding: 20px;">
+                                <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px;">
+                                    <h2 style="text-align: center; color: #28a745;">Booking Details</h2>
+                                    <p style="text-align: center;">Full information of your reservation</p>
+                                    <hr>
+                            
+                                    <h3>Booking ID: %d</h3>
+                                    <p><strong>Status:</strong> %s</p>
+                                    <p><strong>Table:</strong> %s</p>
+                                    <p><strong>Start:</strong> %s</p>
+                                    <p><strong>End:</strong> %s</p>
+                                    <p><strong>Note:</strong> %s</p>
+                                    <p><strong>Prepaid:</strong> %,.0f VND</p>
+                                    <p><strong>Total:</strong> %,.0f VND</p>
+                            
+                                    <hr>
+                                    <h4 style="color: #007bff;">Payments</h4>
+                                    %s
+                            
+                                    <hr>
+                                    <h4 style="color: #28a745;">Order Details</h4>
+                                    <ul style="padding-left: 20px;">
+                                        %s
+                                    </ul>
+                            
+                                    <hr>
+                                    <p style="text-align: center;">Thank you for your reservation!</p>
+                                </div>
+                            </body>
+                            </html>
+                            """,
+                    booking.getId(),
+                    booking.getStatus().toString(),
+                    (booking.getTable() != null ? "Table " + booking.getTable().getNumber() : "N/A"),
+                    booking.getStartTime().toString(),
+                    booking.getEndTime().toString(),
+                    booking.getNote() != null ? booking.getNote() : "",
+                    booking.getPrePaidFee(),
+                    booking.getAmount(),
+                    generatePaymentHtml(booking.getPayments()),
+                    generateOrderDetailHtml(booking.getBookingDetails())
+            );
+        }
+
+        private String generatePaymentHtml(List<Payment> payments) {
+            if (payments == null || payments.isEmpty()) {
+                return "<p>No payments found.</p>";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (Payment p : payments) {
+                sb.append(String.format("""
+                                    <div style="border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                                        <p><strong>Type:</strong> %s</p>
+                                        <p><strong>Amount:</strong> %d VND</p>
+                                        <p><strong>Bank:</strong> %s</p>
+                                        <p><strong>Status:</strong> %s</p>
+                                        <p><strong>Paid At:</strong> %s</p>
+                                    </div>
+                                """,
+                        p.getType(),
+                        p.getAmount(),
+                        p.getBankCode(),
+                        p.getTransactionStatus(),
+                        p.getPaid_at()
+                ));
+            }
+            return sb.toString();
+        }
+
+        private String generateOrderDetailHtml(List<BookingDetail> details) {
+            if (details == null || details.isEmpty()) {
+                return "<li>No food items.</li>";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (BookingDetail d : details) {
+                sb.append(String.format(
+                        "<li>%s x%d - %,.0f VND</li>",
+                        d.getFood().getName(),
+                        d.getQuantity(),
+                        d.getPrice()
+                ));
+            }
+            return sb.toString();
         }
     }
 }

@@ -148,102 +148,77 @@
     }
 
     // Form Validation - SỬA LẠI ĐỂ KHỚP VỚI FIELDS MỚI
-    document.getElementById('registerForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const terms = document.getElementById('terms').checked;
-
-        let isValid = true;
-
-        // Clear previous errors
-        clearErrors();
-
-        // Validate name
-        if (firstName.length < 2) {
-            showError('nameError', 'Tên phải có ít nhất 2 ký tự');
-            isValid = false;
-        }
-
-        if (lastName.length < 2) {
-            showError('nameError', 'Họ phải có ít nhất 2 ký tự');
-            isValid = false;
-        }
-
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showError('emailError', 'Email không hợp lệ');
-            isValid = false;
-        }
-
-        // Validate phone
-        const phoneRegex = /^(0|84)(3[2-9]|5[689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/;
-        if (!phoneRegex.test(phone)) {
-            showError('phoneError', 'Số điện thoại không đúng định dạng');
-            isValid = false;
-        }
-
-        // Validate password
-        if (password.length < 6) {
-            showError('passwordError', 'Mật khẩu phải có ít nhất 6 ký tự');
-            isValid = false;
-        }
-
-        // Validate confirm password
-        if (password !== confirmPassword) {
-            showError('confirmPasswordError', 'Mật khẩu xác nhận không khớp');
-            isValid = false;
-        }
-
-        // Validate terms
-        if (!terms) {
-            alert('Vui lòng đồng ý với điều khoản sử dụng');
-            isValid = false;
-        }
-
-        if (isValid) {
-            // Show loading state
-            const btn = document.getElementById('registerBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-            btn.disabled = true;
-
-            // Submit form
-            this.submit();
-        }
-    });
-
-    function showError(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        errorElement.textContent = message;
-        errorElement.parentElement.classList.add('error');
-    }
-
-    function clearErrors() {
-        const errorElements = document.querySelectorAll('.field-error');
-        errorElements.forEach(element => {
-            element.textContent = '';
-            element.parentElement.classList.remove('error');
-        });
-    }
-
-    // Real-time validation
-    document.getElementById('confirmPassword').addEventListener('input', function () {
-        const password = document.getElementById('password').value;
-        const confirmPassword = this.value;
-
-        if (confirmPassword && password !== confirmPassword) {
-            showError('confirmPasswordError', 'Mật khẩu xác nhận không khớp');
-        } else {
-            document.getElementById('confirmPasswordError').textContent = '';
-            this.parentElement.parentElement.classList.remove('error');
-        }
-    });
+    // document.getElementById('registerForm').addEventListener('submit', function (e) {
+    //     e.preventDefault();
+    //
+    //     const firstName = document.getElementById('firstName').value.trim();
+    //     const lastName = document.getElementById('lastName').value.trim();
+    //     const email = document.getElementById('email').value.trim();
+    //     const phone = document.getElementById('phone').value.trim();
+    //     const password = document.getElementById('password').value;
+    //     const confirmPassword = document.getElementById('confirmPassword').value;
+    //     const terms = document.getElementById('terms').checked;
+    //
+    //     let isValid = true;
+    //
+    //     // Clear previous errors
+    //     clearErrors();
+    //
+    //     // Validate name
+    //     if (firstName.length < 2) {
+    //         showError('nameError', 'Tên phải có ít nhất 2 ký tự');
+    //         isValid = false;
+    //     }
+    //
+    //     if (lastName.length < 2) {
+    //         showError('nameError', 'Họ phải có ít nhất 2 ký tự');
+    //         isValid = false;
+    //     }
+    //
+    //     // Validate email
+    //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //     if (!emailRegex.test(email)) {
+    //         showError('emailError', 'Email không hợp lệ');
+    //         isValid = false;
+    //     }
+    //
+    //     // Validate phone
+    //     const phoneRegex = /^(0|84)(3[2-9]|5[689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/;
+    //     if (!phoneRegex.test(phone)) {
+    //         showError('phoneError', 'Số điện thoại không đúng định dạng');
+    //         isValid = false;
+    //     }
+    //
+    //     // Validate terms
+    //     if (!terms) {
+    //         alert('Vui lòng đồng ý với điều khoản sử dụng');
+    //         isValid = false;
+    //     }
+    //
+    //     if (isValid) {
+    //         // Show loading state
+    //         const btn = document.getElementById('registerBtn');
+    //         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    //         btn.disabled = true;
+    //
+    //         // Submit form
+    //         this.submit();
+    //     }
+    // });
+    //
+    // function showError(elementId, message) {
+    //     const errorElement = document.getElementById(elementId);
+    //     errorElement.textContent = message;
+    //     errorElement.parentElement.classList.add('error');
+    // }
+    //
+    // function clearErrors() {
+    //     const errorElements = document.querySelectorAll('.field-error');
+    //     errorElements.forEach(element => {
+    //         element.textContent = '';
+    //         element.parentElement.classList.remove('error');
+    //     });
+    // }
 </script>
 </body>
 </html>
