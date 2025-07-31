@@ -67,7 +67,7 @@ public class FoodDao extends GenericDao<Food> {
         return query.getResultStream().findFirst().orElse(null);
     }
     public List<Food> searchFoods(String keyword, Double priceFrom, Double priceTo,
-                                  String[] categoryIds, String[] allergyIds, String[] tasteIds) {
+                                  String[] categoryIds, String[] allergyIds, String[] tasteIds, String sortOption) {
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<Food> cq = cb.createQuery(Food.class);
@@ -120,6 +120,25 @@ public class FoodDao extends GenericDao<Food> {
             }
 
             cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+            if (sortOption != null) {
+                switch (sortOption) {
+                    case "price-asc":
+                        cq.orderBy(cb.asc(foodRoot.get("price")));
+                        break;
+                    case "price-desc":
+                        cq.orderBy(cb.desc(foodRoot.get("price")));
+                        break;
+                    case "name-a-z":
+                        cq.orderBy(cb.asc(foodRoot.get("name")));
+                        break;
+                    case "name-z-a":
+                        cq.orderBy(cb.desc(foodRoot.get("name")));
+                        break;
+                    default:
+                        // no sorting
+                }
+            }
 
             List<Food> result = entityManager.createQuery(cq).getResultList();
 

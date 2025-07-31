@@ -157,6 +157,7 @@
         document.getElementById("endWeek").value = currentWeek;
 
         updateWeekRangeInfo();
+        $("#loadRestaurantRevenue").click()
     }
 
     // Gọi khi trang load

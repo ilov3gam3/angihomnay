@@ -12,4 +12,9 @@ public class ReviewDao extends GenericDao<Review> {
         bookingTypedQuery.setParameter("id", bookingId);
         return bookingTypedQuery.getResultStream().findFirst().orElse(null);
     }
+    public List<Review> getByResId(long id){
+        TypedQuery<Review> query = entityManager.createQuery("select r from Review r where r.booking.table.restaurant.id = :id", Review.class);
+        query.setParameter("id", id);
+        return query.getResultList();
+    }
 }

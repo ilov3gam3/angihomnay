@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.Constant.BookingStatus" %>
 <%@ page import="java.time.LocalDateTime" %>
+<%@ page import="Model.Constant.TransactionStatus" %>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,6 +69,7 @@
                                 </a>
                                 <p class="mb-1"><strong>Status:</strong> <span class="badge bg-info"><%= booking.getStatus() %></span></p>
                                 <p class="mb-1"><strong>Table:</strong> <%= booking.getTable() != null ? booking.getTable().getNumber() : "N/A" %></p>
+                                <p class="mb-1"><strong>Number of people:</strong> <%= booking.getPeople() %></p>
                                 <p class="mb-1"><strong>Start:</strong> <%= booking.getStartTime() %></p>
                                 <p class="mb-1"><strong>End:</strong> <%= booking.getEndTime() %></p>
                                 <p class="mb-1"><strong>Note:</strong> <%= booking.getNote() %></p>
@@ -86,6 +88,7 @@
                             if (payments != null && !payments.isEmpty()) {
                                 for (Model.Payment payment : payments) {
                         %>
+                        <% if (payment.getTransactionStatus() == TransactionStatus.SUCCESS) {%>
                         <div class="border rounded p-2 mb-2">
                             <p class="mb-1"><strong>Type:</strong> <%= payment.getType() %></p>
                             <p class="mb-1"><strong>Amount:</strong> <%= payment.getAmount() %>VND</p>
@@ -97,6 +100,7 @@
                             </p>
                             <p class="mb-0"><strong>Paid At:</strong> <%= payment.getPaid_at() %></p>
                         </div>
+                        <%}%>
                         <%
                             }
                         } else {

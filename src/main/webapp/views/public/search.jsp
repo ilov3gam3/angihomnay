@@ -41,12 +41,11 @@
         <div class="container">
             <a href="#0" class="open_filters btn_filters"><i class="icon_adjust-vert"></i></a>
             <div class="sort_select">
-                <select name="sort" id="sort">
-                    <option value="popularity" selected="selected">Sort by Popularity</option>
-                    <option value="rating">Sort by Average rating</option>
-                    <option value="date">Sort by newness</option>
-                    <option value="price">Sort by Price: low to high</option>
-                    <option value="price-desc">Sort by Price: high to low</option>
+                <select name="sort" id="sort" class="form-select">
+                    <option value="price-asc" <%= "price-asc".equals(request.getParameter("sort")) ? "selected" : "" %>>Giá thấp → cao</option>
+                    <option value="price-desc" <%= "price-desc".equals(request.getParameter("sort")) ? "selected" : "" %>>Giá cao → thấp</option>
+                    <option value="name-a-z" <%= "name-a-z".equals(request.getParameter("sort")) ? "selected" : "" %>>Tên A → Z</option>
+                    <option value="name-z-a" <%= "name-z-a".equals(request.getParameter("sort")) ? "selected" : "" %>>Tên Z → A</option>
                 </select>
             </div>
         </div>
@@ -218,6 +217,13 @@
 <!-- /.modal -->
 
 <%@include file="../common/reservation/js.jsp"%>
+<script>
+    document.getElementById("sort").addEventListener("change", function () {
+        const url = new URL(window.location.href);
+        url.searchParams.set("sort", this.value);
+        window.location.href = url.toString();
+    });
+</script>
 
 </body>
 

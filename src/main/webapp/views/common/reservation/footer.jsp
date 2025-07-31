@@ -7,13 +7,13 @@
                 <div class="footer_wp">
                     <i class="icon_pin_alt"></i>
                     <h3>Address</h3>
-                    <p>97845 Baker st. 567<br>Los Angeles - US</p>
+                    <p>Viet Nam</p>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
                 <div class="footer_wp">
                     <i class="icon_tag_alt"></i>
-                    <h3>Reservations</h3>
+                    <h3>ANGIHOMNAY</h3>
                     <p><a href="tel:009442323221">+94 423-23-221</a><br><a href="#0">reservations@Foores.com</a></p>
                 </div>
             </div>
@@ -22,8 +22,7 @@
                     <i class="icon_clock_alt"></i>
                     <h3>Opening Hours</h3>
                     <ul>
-                        <li>Mon - Sat: 10am - 11pm</li>
-                        <li>Sunday: Closed</li>
+                        <li>24/7</li>
                     </ul>
                 </div>
             </div>

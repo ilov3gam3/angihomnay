@@ -3,6 +3,7 @@ package Controller;
 import Dao.FoodDao;
 import Dao.RestaurantDao;
 import Dao.RestaurantTableDao;
+import Dao.ReviewDao;
 import Model.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -208,5 +209,26 @@ public class RestaurantController {
             }
         }
     }
-
+    @WebServlet("/restaurant-detail")
+    public static class RestaurantDetailServlet extends HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            long id = Long.parseLong(req.getParameter("id"));
+            RestaurantDao restaurantDao = new RestaurantDao();
+            Restaurant restaurant = restaurantDao.getById(id);
+            if (restaurant == null) {
+                req.getSession().setAttribute("flash_error", "Không tìm thấy nhà hàng");
+                resp.sendRedirect(req.getContextPath() + "/");
+                return;
+            }
+            ReviewDao reviewDao = new ReviewDao();
+            FoodDao foodDao = new FoodDao();
+            List<Food> foods = foodDao.getFoodsOfRestaurant(restaurant);
+            List<Review> reviews = reviewDao.getByResId(id);
+            req.setAttribute("restaurant", restaurant);
+            req.setAttribute("reviews", reviews);
+            req.setAttribute("foods", foods);
+            req.getRequestDispatcher("/views/restaurant/detail.jsp").forward(req, resp);
+        }
+    }
 }

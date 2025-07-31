@@ -83,6 +83,8 @@ public class BookingController {
                     return;
                 }
                 booking = new Booking(customer, restaurantTable, startTime, endTime, 0, note, 0, BookingStatus.BOOKED);
+                int people = Integer.parseInt(req.getParameter("people"));
+                booking.setPeople(people);
                 bookingDao.save(booking);
 
                 long prePaidFee = 0;
@@ -96,7 +98,13 @@ public class BookingController {
                 booking.setPrePaidFee(prePaidFee);
                 bookingDao.save(booking);
             }
-            resp.sendRedirect(req.getContextPath() + "/get-vnpay-url?id=" + booking.getId());
+            boolean saveBookingData = Boolean.parseBoolean(req.getParameter("saveBookingData"));
+            if (saveBookingData) {
+                req.getSession().setAttribute("flash_success", "Đã lưu thông tin booking của bạn, vui lòng thanh toán sớm nhất có thể");
+                resp.sendRedirect(req.getContextPath() + "/customer/bookings");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/get-vnpay-url?id=" + booking.getId());
+            }
         }
     }
     @WebServlet("/restaurant/remove-food-from-booking")
@@ -203,7 +211,7 @@ public class BookingController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             BookingDao bookingDao = new BookingDao();
             User user = (User) req.getSession().getAttribute("user");
-            List<Booking> bookings = bookingDao.getByUserId(user.getId());
+            List<Booking> bookings = bookingDao.getByUserId(user.getId()).reversed();
             req.setAttribute("bookings", bookings);
             req.getRequestDispatcher("/views/customer/your-bookings.jsp").forward(req, resp);
         }
@@ -217,7 +225,7 @@ public class BookingController {
             BookingDao bookingDao = new BookingDao();
             User user = (User) req.getSession().getAttribute("user");
             Restaurant restaurant = restaurantDao.getById(user.getId());
-            List<Booking> bookings = bookingDao.getBookingByResId(restaurant.getId());
+            List<Booking> bookings = bookingDao.getBookingByResId(restaurant.getId()).reversed();
             req.setAttribute("bookings", bookings);
             req.getRequestDispatcher("/views/restaurant/bookings.jsp").forward(req, resp);
         }

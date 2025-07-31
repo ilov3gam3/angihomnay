@@ -21,6 +21,8 @@ public class Booking extends DistributedEntity {
     @ManyToOne
     private RestaurantTable table;
 
+    private int people;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private double prePaidFee;

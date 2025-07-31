@@ -31,7 +31,9 @@ public class RestaurantTableDao extends GenericDao<RestaurantTable> {
                     and not exists (
                         select 1 from Booking b
                         where b.table.id = rt.id
-                        and b.status != 'CANCELLED'
+                        and b.status != 'BOOKED'
+                        and b.status != 'CANCELED'
+                        and b.status != 'NO_SHOW'
                         and b.startTime < :endTime
                         and b.endTime > :startTime
                     )

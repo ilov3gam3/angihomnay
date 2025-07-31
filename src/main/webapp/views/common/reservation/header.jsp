@@ -37,6 +37,10 @@
             <% } else { %>
             <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/customer/book">Đặt bàn ngay</a>
             </li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/views/public/ask-ai.jsp">Tìm món ăn cùng AI</a>
+            </li>
+            <li><a class="nav-link text-light" href="<%= request.getContextPath()%>/views/public/wheel.jsp">Quay món ngẫu nhiên</a>
+            </li>
             <% } %>
         </ul>
 
@@ -51,10 +55,11 @@
         <div class="dropdown">
             <button class="btn btn-dark d-flex align-items-center dropdown-toggle" type="button"
                     id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <div class="avatar rounded-circle bg-purple text-white d-flex align-items-center justify-content-center me-2"
-                     style="width: 30px; height: 30px;">
-                    <%= user.getEmail() != null ? user.getEmail().substring(0, 1).toUpperCase() : "U" %>
-                </div>
+<%--                <div class=" rounded-circle bg-purple text-white d-flex align-items-center justify-content-center me-2"--%>
+<%--                     style="width: 30px; height: 30px;">--%>
+<%--                    <%= user.getEmail() != null ? user.getEmail().substring(0, 1).toUpperCase() : "U" %>--%>
+<%--                </div>--%>
+                <img class="rounded-circle m-1" src="<%=user.getAvatar()%>" style="width: 30px; height: 30px;" alt="">
                 <%= user.getEmail() %>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

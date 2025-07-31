@@ -62,6 +62,19 @@
 <script>
     const ctxAdmin = document.getElementById('adminChart').getContext('2d');
     let restaurantChart, adminChart;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Tự động chọn tháng hiện tại
+        const now = new Date();
+        const monthInput = document.getElementById("month");
+        const yearInput = document.getElementById("year");
+        monthInput.value = now.getMonth() + 1; // getMonth() trả về từ 0-11
+        yearInput.value = now.getFullYear();
+
+        // Tự động click nút để load chart
+        document.getElementById("loadAdminRevenue").click();
+    });
+
     document.getElementById("loadAdminRevenue").addEventListener("click", () => {
         const month = document.getElementById("month").value;
         const year = document.getElementById("year").value;

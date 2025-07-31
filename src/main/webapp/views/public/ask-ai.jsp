@@ -21,15 +21,10 @@
 <main>
     <div class="container">
         <div class="col-12 d-flex justify-content-center">
-            <button id="ask_button" class="btn btn-success m-1">Hỏi AI</button>
-            <button id="wheel_button" class="btn btn-outline-success m-1">Quay món ngẫu nhiên</button>
-        </div>
-        <div class="col-12 d-flex justify-content-center">
-            <div id="ask" class="col-12">
+            <div class="col-12">
                 <div class="card-header">Gợi ý món ăn từ AI</div>
                 <div class="card-body" id="chatBox"
                      style="height: 300px; overflow-y: auto; background: #f8f9fa;"></div>
-
                 <!-- FORM bên trong box chat -->
                 <form id="aiSuggestionForm" class="p-3 border-top">
                     <div class="form-group">
@@ -76,11 +71,6 @@
                     <button type="submit" class="btn btn-success mt-3">Gửi</button>
                 </form>
             </div>
-            <div id="wheel" style="display: none">
-                <button id="spinButton" class="btn btn-success">Quay món ăn</button>
-                <h1 class="text-center">↓</h1>
-                <canvas id="canvas" width="500" height="500"></canvas>
-            </div>
         </div>
     </div>
 </main>
@@ -122,20 +112,6 @@
 <%@include file="../common/reservation/js.jsp" %>
 <script src="https://cdn.jsdelivr.net/gh/zarocknz/javascript-winwheel@2.7.0/Winwheel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script> <!-- GSAP là bắt buộc -->
-<script>
-    $("#ask_button").click(function () {
-        $("#ask").show();
-        $("#wheel").hide();
-        $("#ask_button").removeClass('btn-outline-success').addClass('btn-success');
-        $('#wheel_button').removeClass('btn-success').addClass('btn-outline-success');
-    })
-    $("#wheel_button").click(function () {
-        $("#wheel").show();
-        $("#ask").hide();
-        $("#ask_button").removeClass('btn-success').addClass('btn-outline-success');
-        $('#wheel_button').removeClass('btn-outline-success').addClass('btn-success');
-    })
-</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("aiSuggestionForm");
@@ -212,78 +188,6 @@
             div.innerHTML = `<strong>\${sender}</strong>:<br>\${message}`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    });
-</script>
-<script>
-    let theWheel = null;
-    let foodList = [];
-    const fixedColors = ['#e74c3c', '#27ae60', '#3498db', '#f39c12', '#9b59b6', '#e91e63'];
-    function shuffle(array) {
-        return array.sort(() => Math.random() - 0.5);
-    }
-
-    function createWheel(foods) {
-        const segments = foods.map((food, index) => ({
-            fillStyle: fixedColors[index % fixedColors.length],
-            text: food.name,
-            id: food.id
-        }));
-
-        theWheel = new Winwheel({
-            'canvasId': 'canvas',
-            'numSegments': segments.length,
-            'segments': segments,
-            'animation': {
-                'type': 'spinToStop',
-                'duration': 5,
-                'spins': 8,
-                'callbackFinished': function (indicatedSegment) {
-                    const selectedFood = foodList.find(f => f.name === indicatedSegment.text);
-                    if (selectedFood) {
-                        const go = confirm("Bạn đã trúng món: " + selectedFood.name + "\nBạn có muốn xem chi tiết món này?");
-                        if (go) {
-                            window.location.href = "<%=request.getContextPath()%>/food-detail?id=" + selectedFood.id;
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // // Tạo màu ngẫu nhiên cho từng phần
-    // function getRandomColor() {
-    //     const letters = '0123456789ABCDEF';
-    //     let color = '#';
-    //     for (let i = 0; i < 6; i++)
-    //         color += letters[Math.floor(Math.random() * 16)];
-    //     return color;
-    // }
-
-    // Gọi API và khởi tạo vòng quay
-    fetch('<%=request.getContextPath()%>/api/get-all-food')
-        .then(response => response.json())
-        .then(data => {
-            if (!Array.isArray(data) || data.length < 1) {
-                alert("Không có dữ liệu món ăn!");
-                return;
-            }
-
-            foodList = shuffle(data).slice(0, 6); // Lấy 6 món ngẫu nhiên
-            createWheel(foodList);
-        })
-        .catch(error => {
-            console.error('Lỗi khi gọi API:', error);
-            alert('Lỗi khi lấy danh sách món ăn.');
-        });
-
-    // Gắn sự kiện quay khi bấm nút
-    document.getElementById('spinButton').addEventListener('click', function () {
-        if (theWheel) {
-            theWheel.stopAnimation(false); // nếu đang quay thì dừng
-            theWheel.rotationAngle = 0;
-            theWheel.draw();
-            theWheel.startAnimation();
         }
     });
 </script>

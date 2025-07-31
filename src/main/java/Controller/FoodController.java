@@ -148,16 +148,8 @@ public class FoodController {
 
             Double priceFrom = parseDouble(req.getParameter("priceFrom"));
             Double priceTo = parseDouble(req.getParameter("priceTo"));
-
-            List<Food> result = foodDao.searchFoods(searchString, priceFrom, priceTo, categoryIds, allergyIds, tasteIds);
-//            System.out.println("debug in servlet");
-//            for (int i = 0; i < result.size(); i++) {
-//                System.out.println(result.get(i).getId());
-//                System.out.println(result.get(i).getCategories());
-//                System.out.println(result.get(i).getAllergyContents());
-//                System.out.println(result.get(i).getTastes());
-//            }
-//            System.out.println("debug in servlet");
+            String sort = req.getParameter("sort");
+            List<Food> result = foodDao.searchFoods(searchString, priceFrom, priceTo, categoryIds, allergyIds, tasteIds, sort);
             List<Long> foodIds = new ArrayList<>();
             for (Food food : result) {
                 foodIds.add(food.getId());

@@ -77,6 +77,8 @@
                             <input type="hidden" name="restaurantId" id="hidden_restaurant">
                             <input type="hidden" name="startTime" id="hidden_start_time">
                             <input type="hidden" name="note" id="hidden_note">
+                            <input type="hidden" name="saveBookingData" id="saveBookingDataInput">
+                            <input type="hidden" name="people" id="peopleInput">
                             <!-- Sẽ thêm dynamic input cho foodIds[] và quantities[] bằng JS -->
                         </form>
                         <form id="wrapped" method="POST">
@@ -113,6 +115,31 @@
                                             <!-- JS will populate time options here -->
                                         </div>
                                     </div>
+
+                                    <div class="step_wrapper">
+                                        <h4>Số người đến ăn?</h4>
+                                        <div class="radio_select">
+                                            <ul>
+                                                <li>
+                                                    <input type="radio" id="people_1" name="people" value="1" class="required">
+                                                    <label for="people_1">1</label>
+                                                </li>
+                                                <li>
+                                                    <input type="radio" id="people_2" name="people" value="2" class="required">
+                                                    <label for="people_2">2</label>
+                                                </li>
+                                                <li>
+                                                    <input type="radio" id="people_3" name="people" value="3" class="required">
+                                                    <label for="people_3">3</label>
+                                                </li>
+                                                <li>
+                                                    <input type="radio" id="people_4" name="people" value="4" class="required">
+                                                    <label for="people_4">4</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!-- /people_select -->
+                                    </div>
                                 </div>
                                 <!-- /step-->
                                 <div class="step">
@@ -136,7 +163,8 @@
                             <div id="bottom-wizard">
                                 <button type="button" name="backward" class="backward">Prev</button>
                                 <button type="button" name="forward" class="forward">Next</button>
-                                <button type="button" id="submitBookingBtn" name="process" class="submit">Submit</button>
+                                <button type="button" id="saveBookingData" name="process" class="submit">Lưu thông tin booking</button>
+                                <button type="button" id="submitBookingBtn" name="process" class="submit">Thanh toán ngay</button>
                             </div>
                             <!-- /bottom-wizard -->
                         </form>
@@ -334,6 +362,71 @@
 <script>
     document.getElementById("submitBookingBtn").addEventListener("click", function () {
         const hiddenForm = document.getElementById("bookingHiddenForm");
+        document.getElementById("saveBookingDataInput").value = false;
+        document.getElementById("peopleInput").value = document.querySelector('input[name="people"]:checked').value;
+
+        // 1. Binding ngày
+        const rawDate = document.getElementById("datepicker_field").value;
+        const isoDate = document.getElementById("datepicker_field").value;
+        document.getElementById("hidden_date").value = isoDate
+
+        // 2. Binding nhà hàng
+        const resId = document.getElementById("restaurantSelect").value;
+        document.getElementById("hidden_restaurant").value = resId;
+
+        // 3. Binding giờ
+        const selectedTime = document.querySelector('input[name="time"]:checked');
+        if (!selectedTime) {
+            alert("Vui lòng chọn giờ");
+            return;
+        }
+
+        // Ghép ngày + giờ thành LocalDateTime: yyyy-MM-ddTHH:mm
+        const timeStr = selectedTime.value.replace("am", "").replace("pm", "");
+        let [hour, minute] = timeStr.split(".");
+        hour = parseInt(hour);
+        if (selectedTime.value.includes("pm") && hour < 12) hour += 12;
+        if (selectedTime.value.includes("am") && hour === 12) hour = 0;
+
+        const startTime = isoDate + "T" + hour.toString().padStart(2, '0') + ":" + minute;
+        console.log("startTime:", startTime);
+        document.getElementById("hidden_start_time").value = startTime;
+
+        // 4. Gán note nếu có (tùy thêm sau)
+        document.getElementById("hidden_note").value = document.getElementById("note").value
+
+        // 5. Xóa input cũ
+        const existingFoodInputs = hiddenForm.querySelectorAll("input[name='foodIds'], input[name='quantities']");
+        existingFoodInputs.forEach(el => el.remove());
+
+        // 6. Binding món ăn và quantity
+        const quantityInputs = document.querySelectorAll(".quantity-input");
+        quantityInputs.forEach((input) => {
+            const qty = parseInt(input.value);
+            if (qty > 0) {
+                const foodId = input.closest(".food-quantity").getAttribute("data-food-id");
+
+                const foodInput = document.createElement("input");
+                foodInput.type = "hidden";
+                foodInput.name = "foodIds";
+                foodInput.value = foodId;
+
+                const qtyInput = document.createElement("input");
+                qtyInput.type = "hidden";
+                qtyInput.name = "quantities";
+                qtyInput.value = qty;
+
+                hiddenForm.appendChild(foodInput);
+                hiddenForm.appendChild(qtyInput);
+            }
+        });
+        hiddenForm.submit();
+    });
+
+    document.getElementById("saveBookingData").addEventListener("click", function () {
+        const hiddenForm = document.getElementById("bookingHiddenForm");
+        document.getElementById("saveBookingDataInput").value = true;
+        document.getElementById("peopleInput").value = document.querySelector('input[name="people"]:checked').value;
 
         // 1. Binding ngày
         const rawDate = document.getElementById("datepicker_field").value;

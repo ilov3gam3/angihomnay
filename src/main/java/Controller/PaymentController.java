@@ -3,12 +3,14 @@ package Controller;
 import Dao.BookingDao;
 import Dao.BookingDetailDao;
 import Dao.PaymentDao;
+import Dao.RestaurantTableDao;
 import Model.Booking;
 import Model.BookingDetail;
 import Model.Constant.BookingStatus;
 import Model.Constant.PaymentType;
 import Model.Constant.TransactionStatus;
 import Model.Payment;
+import Model.RestaurantTable;
 import Util.Config;
 import Util.Mail;
 import Util.VNPayUtil;
@@ -36,6 +38,22 @@ public class PaymentController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             long id = Long.parseLong(req.getParameter("id"));
             Booking booking = new BookingDao().getById(id);
+            if (booking == null){
+                req.getSession().setAttribute("flash_error", "Không tìm thấy booking này.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            if (!(booking.getStatus() == BookingStatus.BOOKED || booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT)){
+                req.getSession().setAttribute("flash_error", "Hiện tại không thể thanh toán booking này.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
+            RestaurantTable restaurantTable = new RestaurantTableDao().findAvailableTable(booking.getTable().getRestaurant().getId(), booking.getStartTime(), booking.getEndTime());
+            if (restaurantTable == null){
+                req.getSession().setAttribute("flash_error", "Hiện đã không còn bàn vào giờ này.");
+                resp.sendRedirect(req.getHeader("referer"));
+                return;
+            }
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
             String orderType = "other";
@@ -191,7 +209,7 @@ public class PaymentController {
             }
             paymentDao.update(payment);
             if (payment.transactionStatus != TransactionStatus.SUCCESS) {
-                req.getSession().setAttribute("flash_success", "Thanh toán không thành công.");
+                req.getSession().setAttribute("flash_error", "Thanh toán không thành công.");
                 resp.sendRedirect(req.getContextPath() + "/customer/bookings");
                 return;
             }
@@ -236,6 +254,7 @@ public class PaymentController {
                                     <h3>Booking ID: %d</h3>
                                     <p><strong>Status:</strong> %s</p>
                                     <p><strong>Table:</strong> %s</p>
+                                    <p><strong>Number of people:</strong> %s</p>
                                     <p><strong>Start:</strong> %s</p>
                                     <p><strong>End:</strong> %s</p>
                                     <p><strong>Note:</strong> %s</p>
@@ -261,6 +280,7 @@ public class PaymentController {
                     booking.getId(),
                     booking.getStatus().toString(),
                     (booking.getTable() != null ? "Table " + booking.getTable().getNumber() : "N/A"),
+                    booking.getPeople(),
                     booking.getStartTime().toString(),
                     booking.getEndTime().toString(),
                     booking.getNote() != null ? booking.getNote() : "",
