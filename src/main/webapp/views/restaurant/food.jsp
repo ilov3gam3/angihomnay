@@ -252,8 +252,6 @@
 </div>
 <!-- /main -->
 
-<%@include file="../common/reservation/footer.jsp"%>
-<!--/footer-->
 
 <div id="toTop"></div><!-- Back to top button -->
 

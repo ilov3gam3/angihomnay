@@ -27,7 +27,7 @@
             Booking booking = new BookingDao().getById(Long.parseLong(request.getParameter("id")));
             if (booking != null) {
         %>
-        <% if ((booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT || booking.getStatus() == BookingStatus.DEPOSITED) && booking.getStartTime().isBefore(LocalDateTime.now()) && booking.getEndTime().isAfter(LocalDateTime.now())) {%>
+        <% if ((booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT || booking.getStatus() == BookingStatus.DEPOSITED) && LocalDateTime.now().isBefore(booking.getStartTime())) {%>
         <button class="btn btn-success m-1" data-bs-toggle="modal" data-bs-target="#foodModal" id="btnOpenFoodModal">Gọi thêm món</button>
         <% } %>
         <% if (booking.getStatus() == BookingStatus.WAITING_FINAL_PAYMENT || booking.getStatus() == BookingStatus.BOOKED) {%>

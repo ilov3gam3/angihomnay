@@ -78,7 +78,6 @@
     </div>
 </main>
 
-<%@include file="../common/reservation/footer.jsp"%>
 <%@include file="../common/reservation/js.jsp"%>
 
 <script>

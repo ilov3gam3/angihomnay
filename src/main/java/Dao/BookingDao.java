@@ -2,6 +2,7 @@ package Dao;
 
 import Model.Booking;
 import Model.Constant.BookingStatus;
+import Model.RestaurantTable;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -40,25 +41,6 @@ public class BookingDao extends GenericDao<Booking> {
                 .getSingleResult();
     }
 
-    public void autocancelBooking() {
-        /*EntityTransaction tx = entityManager.getTransaction();
-        try {
-            tx.begin();
-
-            LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(30);
-            entityManager.createQuery(
-                            "UPDATE Booking b SET b.status = :status " +
-                                    "WHERE b.status in ('BOOKED', 'DEPOSITED') AND b.startTime <= :timeLimit")
-                    .setParameter("status", BookingStatus.CANCELED)
-                    .setParameter("timeLimit", timeLimit)
-                    .executeUpdate();
-
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
-        }*/
-    }
     public List<Booking> getByUserId(long userId) {
         TypedQuery<Booking> query = entityManager.createQuery("select b from Booking b left join fetch b.bookingDetails where b.customer.id = :userId", Booking.class);
         return query.setParameter("userId", userId).getResultList();
@@ -116,5 +98,78 @@ public class BookingDao extends GenericDao<Booking> {
         }
 
         return data;
+    }
+
+    public void updateTableCustomerStatus() {
+        EntityTransaction tx = null;
+
+        try {
+            tx = entityManager.getTransaction();
+            tx.begin();
+
+            LocalDateTime now = LocalDateTime.now();
+
+            List<BookingStatus> activeStatuses = List.of(
+                    BookingStatus.DEPOSITED,
+                    BookingStatus.WAITING_FINAL_PAYMENT,
+                    BookingStatus.PAID
+            );
+
+            System.out.println("===> Checking bookings at: " + now);
+
+            // Set isHavingCustomer = true if booking has started
+            List<Booking> ongoingBookings = entityManager.createQuery("""
+            SELECT b FROM Booking b
+            WHERE b.startTime <= :now AND b.endTime > :now
+            AND b.status IN :statuses
+        """, Booking.class)
+                    .setParameter("now", now)
+                    .setParameter("statuses", activeStatuses)
+                    .getResultList();
+
+            System.out.println("===> Found " + ongoingBookings.size() + " ongoing bookings.");
+
+            for (Booking booking : ongoingBookings) {
+                RestaurantTable table = booking.getTable();
+                if (!table.isHavingCustomer()) {
+                    System.out.printf("✅ Booking %d has started => Setting isHavingCustomer = true for table %d%n",
+                            booking.getId(), table.getId());
+                    table.setHavingCustomer(true);
+                    entityManager.merge(table);
+                }
+            }
+
+            // Set isHavingCustomer = false if booking has ended
+            List<Booking> endedBookings = entityManager.createQuery("""
+            SELECT b FROM Booking b
+            WHERE b.endTime <= :now
+            AND b.status IN :statuses
+        """, Booking.class)
+                    .setParameter("now", now)
+                    .setParameter("statuses", activeStatuses)
+                    .getResultList();
+
+            System.out.println("===> Found " + endedBookings.size() + " ended bookings.");
+
+            for (Booking booking : endedBookings) {
+                RestaurantTable table = booking.getTable();
+                if (table.isHavingCustomer()) {
+                    System.out.printf("🔁 Booking %d has ended => Setting isHavingCustomer = false for table %d%n",
+                            booking.getId(), table.getId());
+                    table.setHavingCustomer(false);
+                    entityManager.merge(table);
+                }
+            }
+
+            entityManager.flush(); // ensure everything is written
+            tx.commit();
+            System.out.println("===> Done updating table status.");
+
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
+        }
     }
 }

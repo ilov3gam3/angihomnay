@@ -128,7 +128,7 @@
                             <li class="list-group-item text-muted">No food items.</li>
                             <% } %>
                         </ul>
-                        <% if ((booking.getStatus() == BookingStatus.DEPOSITED || booking.getStatus() == BookingStatus.PAID) && booking.getEndTime().isBefore(LocalDateTime.now())) {%>
+                        <% if ((booking.getStatus() == BookingStatus.DEPOSITED || booking.getStatus() == BookingStatus.PAID)) {%>
                         <a href="<%=request.getContextPath()%>/customer/review?bookingId=<%=booking.getId()%>">
                             <button class="btn btn-success">Review</button>
                         </a>

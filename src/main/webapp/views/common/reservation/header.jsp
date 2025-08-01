@@ -10,9 +10,10 @@
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-
+    <% String uri = request.getRequestURI().replace(request.getContextPath(), ""); %>
+    <% if (!uri.contains("/auth/")){ %>
     <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mt-2 mb-lg-0">
             <%--<li class="nav-item"><a class="nav-link text-light" href="#">Quay món</a></li>
             <li class="nav-item"><a class="nav-link text-light" href="#">Món hot</a></li>
             <li class="nav-item"><a class="nav-link text-light" href="#">Thực đơn</a></li>
@@ -55,10 +56,10 @@
         <div class="dropdown">
             <button class="btn btn-dark d-flex align-items-center dropdown-toggle" type="button"
                     id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-<%--                <div class=" rounded-circle bg-purple text-white d-flex align-items-center justify-content-center me-2"--%>
-<%--                     style="width: 30px; height: 30px;">--%>
-<%--                    <%= user.getEmail() != null ? user.getEmail().substring(0, 1).toUpperCase() : "U" %>--%>
-<%--                </div>--%>
+                <%--                <div class=" rounded-circle bg-purple text-white d-flex align-items-center justify-content-center me-2"--%>
+                <%--                     style="width: 30px; height: 30px;">--%>
+                <%--                    <%= user.getEmail() != null ? user.getEmail().substring(0, 1).toUpperCase() : "U" %>--%>
+                <%--                </div>--%>
                 <img class="rounded-circle m-1" src="<%=user.getAvatar()%>" style="width: 30px; height: 30px;" alt="">
                 <%= user.getEmail() %>
             </button>
@@ -71,9 +72,9 @@
                 <% } %>
                 <% if (user.getRole() != Role.ADMIN) {%>
                 <li>
-                <a class="dropdown-item"
-                   href="<%= request.getContextPath()%>/customer/bookings"><i
-                        class="fas fa-utensils"></i> Booking của bạn</a></li>
+                    <a class="dropdown-item"
+                       href="<%= request.getContextPath()%>/customer/bookings"><i
+                            class="fas fa-utensils"></i> Booking của bạn</a></li>
                 <% } %>
                 <li><a class="dropdown-item" href="<%= request.getContextPath() %>/logout"><i
                         class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
@@ -83,6 +84,7 @@
         <a href="<%= request.getContextPath() %>/login" class="btn btn-outline-light">Đăng nhập</a>
         <% } %>
     </div>
+    <% } %>
 </nav>
 
 <!-- Custom CSS -->

@@ -23,7 +23,7 @@ public class CronJobListener implements ServletContextListener {
             // ✨ Mã cronjob bạn muốn chạy ở đây
             System.out.println("Cronjob running at: " + java.time.LocalDateTime.now());
             try {
-                new BookingDao().autocancelBooking();
+                new BookingDao().updateTableCustomerStatus();
             } catch (Exception e) {
                 e.printStackTrace();
             }

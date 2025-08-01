@@ -20,8 +20,26 @@
 
 <main>
   <div class="container">
-        <h1 class="text-center">↓</h1>
-    <div class="d-flex justify-content-center">
+    <h1 class="text-center mb-3">🎯 Vòng quay món ăn</h1>
+
+    <div class="mb-4 text-center">
+      <label class="me-3">
+        <input type="radio" name="mode" value="auto" checked> Random 6 món ăn
+      </label>
+      <label>
+        <input type="radio" name="mode" value="manual"> Chọn món ăn thủ công
+      </label>
+    </div>
+
+    <div id="manualSelectWrapper" class="mb-4 d-none">
+      <label>Chọn tối đa 6 món ăn:</label>
+      <select id="manualSelect" class="form-select" multiple size="6">
+        <!-- Sẽ được JS đổ dữ liệu -->
+      </select>
+      <small class="text-muted">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều món.</small>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
       <canvas onclick="spin()" id="canvas" width="500" height="500"></canvas>
     </div>
   </div>
@@ -67,7 +85,10 @@
 <script>
   let theWheel = null;
   let foodList = [];
+  let allFoods = [];
+
   const fixedColors = ['#e74c3c', '#27ae60', '#3498db', '#f39c12', '#9b59b6', '#e91e63'];
+
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
   }
@@ -100,16 +121,7 @@
     });
   }
 
-  // // Tạo màu ngẫu nhiên cho từng phần
-  // function getRandomColor() {
-  //     const letters = '0123456789ABCDEF';
-  //     let color = '#';
-  //     for (let i = 0; i < 6; i++)
-  //         color += letters[Math.floor(Math.random() * 16)];
-  //     return color;
-  // }
-
-  // Gọi API và khởi tạo vòng quay
+  // Lấy dữ liệu món ăn từ API
   fetch('<%=request.getContextPath()%>/api/get-all-food')
           .then(response => response.json())
           .then(data => {
@@ -118,24 +130,67 @@
               return;
             }
 
-            foodList = shuffle(data).slice(0, 6); // Lấy 6 món ngẫu nhiên
+            allFoods = data;
+
+            // Auto mode default
+            foodList = shuffle(allFoods).slice(0, 6);
             createWheel(foodList);
+
+            // Đổ dữ liệu vào select
+            const select = document.getElementById('manualSelect');
+            allFoods.forEach(food => {
+              const opt = document.createElement('option');
+              opt.value = food.id;
+              opt.textContent = food.name;
+              select.appendChild(opt);
+            });
           })
           .catch(error => {
             console.error('Lỗi khi gọi API:', error);
             alert('Lỗi khi lấy danh sách món ăn.');
           });
 
-  // Gắn sự kiện quay khi bấm nút
-    function spin() {
-      if (theWheel) {
-        theWheel.stopAnimation(false); // nếu đang quay thì dừng
-        theWheel.rotationAngle = 0;
-        theWheel.draw();
-        theWheel.startAnimation();
+  // Chọn chế độ
+  document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const mode = e.target.value;
+      const wrapper = document.getElementById('manualSelectWrapper');
+
+      if (mode === 'manual') {
+        wrapper.classList.remove('d-none');
+      } else {
+        wrapper.classList.add('d-none');
+        foodList = shuffle(allFoods).slice(0, 6);
+        createWheel(foodList);
       }
+    });
+  });
+
+  // Xử lý khi chọn món thủ công
+  document.getElementById('manualSelect').addEventListener('change', () => {
+    const selectedIds = Array.from(document.getElementById('manualSelect').selectedOptions).map(opt => opt.value);
+
+    if (selectedIds.length > 6) {
+      alert("Vui lòng chọn tối đa 6 món ăn.");
+      return;
     }
+
+    foodList = allFoods.filter(f => selectedIds.includes(f.id.toString()));
+    if (foodList.length > 0) {
+      createWheel(foodList);
+    }
+  });
+
+  function spin() {
+    if (theWheel) {
+      theWheel.stopAnimation(false);
+      theWheel.rotationAngle = 0;
+      theWheel.draw();
+      theWheel.startAnimation();
+    }
+  }
 </script>
+
 
 </body>
 

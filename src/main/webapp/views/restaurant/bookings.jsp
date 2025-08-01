@@ -73,7 +73,7 @@
                                     <button class="btn btn-danger">Hủy bàn</button>
                                 </a>
                                 <%}%>
-                                <% if (booking.getStatus() == BookingStatus.DEPOSITED && booking.getStartTime().isAfter(LocalDateTime.now().plusMinutes(30))) {%>
+                                <% if (booking.getStatus() == BookingStatus.DEPOSITED && LocalDateTime.now().isAfter(booking.getStartTime().plusMinutes(30))) {%>
                                 <a href="<%=request.getContextPath()%>/restaurant/no-show?id=<%=booking.getId()%>">
                                     <button class="btn btn-danger">Không tới</button>
                                 </a>
@@ -172,8 +172,6 @@
 
 <!-- /main -->
 
-<%@include file="../common/reservation/footer.jsp" %>
-<!--/footer-->
 
 <div id="toTop"></div><!-- Back to top button -->
 

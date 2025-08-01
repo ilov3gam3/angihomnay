@@ -48,11 +48,13 @@ public class PaymentController {
                 resp.sendRedirect(req.getHeader("referer"));
                 return;
             }
-            RestaurantTable restaurantTable = new RestaurantTableDao().findAvailableTable(booking.getTable().getRestaurant().getId(), booking.getStartTime(), booking.getEndTime());
-            if (restaurantTable == null){
-                req.getSession().setAttribute("flash_error", "Hiện đã không còn bàn vào giờ này.");
-                resp.sendRedirect(req.getHeader("referer"));
-                return;
+            if (booking.getStatus() == BookingStatus.BOOKED){
+                RestaurantTable restaurantTable = new RestaurantTableDao().findAvailableTable(booking.getTable().getRestaurant().getId(), booking.getStartTime(), booking.getEndTime());
+                if (restaurantTable == null){
+                    req.getSession().setAttribute("flash_error", "Hiện đã không còn bàn vào giờ này.");
+                    resp.sendRedirect(req.getHeader("referer"));
+                    return;
+                }
             }
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";

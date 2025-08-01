@@ -33,7 +33,6 @@
         <table class="table table-bordered align-middle">
             <thead class="table-light">
             <tr>
-                <th>ID</th>
                 <th>Số bàn</th>
                 <th>Khả dụng</th>
                 <th>Được sử dụng</th>
@@ -43,7 +42,6 @@
             <tbody>
             <% for (RestaurantTable t : tables) { %>
             <tr>
-                <td><%= t.getId() %></td>
                 <td><%= t.getNumber() %></td>
                 <td><span class="badge bg-<%= t.isAvailable() ? "success" : "secondary" %>">
                         <%= t.isAvailable() ? "Có" : "Không" %>
@@ -138,8 +136,6 @@
 </main>
 <!-- /main -->
 
-<%@include file="../common/reservation/footer.jsp"%>
-<!--/footer-->
 
 <div id="toTop"></div><!-- Back to top button -->
 

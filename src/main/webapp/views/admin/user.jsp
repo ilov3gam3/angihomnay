@@ -209,8 +209,7 @@
                     <div class="col-md-6">
                         <label for="createRole" class="form-label"><i class="fas fa-user-tag"></i> Vai trò</label>
                         <select name="role" id="createRole" class="form-select" onchange="onRoleChange(this.value)">
-                            <option value="ADMIN">Admin</option>
-                            <option value="CUSTOMER">Customer</option>
+                            <option value="CUSTOMER" selected>Customer</option>
                             <option value="RESTAURANT">Restaurant</option>
                         </select>
                     </div>
@@ -232,7 +231,7 @@
                     </div>
 
                     <!-- CUSTOMER ONLY -->
-                    <div id="customerFields" style="display: none;">
+                    <div id="customerFields">
                         <div class="col-md-6">
                             <label for="firstName" class="form-label"><i class="fas fa-user"></i> Họ</label>
                             <input type="text" name="firstName" id="firstName" class="form-control input-focus-animation">
@@ -370,8 +369,6 @@
 
 <!-- /main -->
 
-<%@include file="../common/reservation/footer.jsp"%>
-<!--/footer-->
 
 <div id="toTop"></div><!-- Back to top button -->
 
