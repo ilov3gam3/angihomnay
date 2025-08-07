@@ -1,4 +1,4 @@
-huy(admin)
+**huy(admin)**
 - quản lý người dùng
 	+ /admin/user doGet -> lấy danh sách người dùng
 	+ /admin/user doPost -> thêm mới người dùng(customer, restaurant)
@@ -10,7 +10,7 @@ huy(admin)
 - thống kê
     + /api/revenue-statistics doGet -> với role là admin, lấy doanh thu của tất cả nhà hàng trong tháng x, năm y ( được chọn ở fe ). ví dụ response của api [{"revenue":400000.0,"restaurant":"Nhà Hàng Phì Lũ 1"},{"revenue":600000.0,"restaurant":"Nhà Hàng Phì Lũ 2"}]
     + sau đó dùng chart.js để vẽ biểu đồ
-hiếu (restaurant)
+**hiếu (restaurant)**
 - quản lý bàn ăn
     + /restaurant/tables -> doGet, lấy danh sách bàn ăn của 1 nhà hàng
     + /restaurant/tables -> doPost, thêm bàn, nếu thêm 1 bàn thì chỉ có param from, nếu thêm nhiều bàn thì có thêm param to
@@ -25,3 +25,7 @@ hiếu (restaurant)
     + /restaurant/bookings doGet -> lấy các đơn đặt bàn của nhà hàng đó ra
     + /restaurant/cancel doGet -> hủy booking, chỉ có thể hủy booking chưa thanh toán giữ chỗ
     + /restaurant/no-show doGet -> đánh dấu booking đó khách hàng không tới
+**search**
+- chỉ có 1 link /search doGet nhận vào các param searchString, categories, allergyContents, tastes, priceFrom, priceTo, sort, sau đó đưa vào search(FoodDao)
+- lên chatgpt tìm hiểu thêm về CriteriaBuilder và CriteriaQuery dùng cho dynamic search
+- các dòng if là để kiểm tra xem người dùng có gửi param đó lên không, nếu có thì mới đưa vào CriteriaBuilder
