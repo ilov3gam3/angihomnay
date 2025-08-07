@@ -60,7 +60,7 @@ public class FoodDao extends GenericDao<Food> {
         return foods;
     }
 
-    public Food getFoodOfRestaurant(Restaurant restaurant, long foodId) {
+    public Food getFoodOfRestaurant(Restaurant restaurant, long foodId) { // jpql
         TypedQuery<Food> query = entityManager.createQuery("select f from Food f left join fetch f.categories where f.restaurant = :restaurant and f.id = : foodId", Food.class);
         query.setParameter("restaurant", restaurant);
         query.setParameter("foodId", foodId);

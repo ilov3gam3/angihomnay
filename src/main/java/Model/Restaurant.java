@@ -16,10 +16,12 @@ import java.util.List;
 public class Restaurant {
     @Id
     private Long id;
+
     @OneToOne
     @MapsId
     @JoinColumn(name="id")
     private User user;
+
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
     private String name;
     @Column(length = 1500)

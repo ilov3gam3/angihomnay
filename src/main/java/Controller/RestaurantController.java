@@ -53,9 +53,8 @@ public class RestaurantController {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             User user = (User) req.getSession().getAttribute("user");
-            RestaurantDao restaurantDao = new RestaurantDao();
-            Restaurant restaurant = restaurantDao.getRestaurantWithTables(user.getId());
-            req.getSession().setAttribute("tables", restaurant.getRestaurantTables());
+            RestaurantTableDao restaurantTableDao = new RestaurantTableDao();
+            req.getSession().setAttribute("tables", restaurantTableDao.getTablesByResId(user.getId()));
             req.getRequestDispatcher("/views/restaurant/tables.jsp").forward(req, resp);
         }
 
@@ -66,7 +65,7 @@ public class RestaurantController {
             RestaurantTableDao restaurantTableDao = new RestaurantTableDao();
             Restaurant restaurant = restaurantDao.getById(user.getId());
             int from = Integer.parseInt(req.getParameter("from"));
-            if (req.getParameter("to").isEmpty()){
+            if (req.getParameter("to").isEmpty()){ // chỉ tạo 1 bàn
                 List<Integer> numbers = new ArrayList<>();
                 numbers.add(from);
                 if (restaurantTableDao.existsAnyNumberInList(numbers, restaurant)) {
@@ -76,7 +75,7 @@ public class RestaurantController {
                 }
                 RestaurantTable restaurantTable = new RestaurantTable(from, restaurant, true, false);
                 restaurantTableDao.save(restaurantTable);
-            } else {
+            } else { // tạo nhiều bàn
                int to = Integer.parseInt(req.getParameter("to"));
                 List<Integer> list = IntStream.rangeClosed(from, to)
                         .boxed()

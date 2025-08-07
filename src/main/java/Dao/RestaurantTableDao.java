@@ -46,4 +46,9 @@ public class RestaurantTableDao extends GenericDao<RestaurantTable> {
                 .getResultList();
         return results.isEmpty() ? null : results.getFirst();
     }
+    public List<RestaurantTable> getTablesByResId(long resId){
+        TypedQuery<RestaurantTable> query = entityManager.createQuery("select t from RestaurantTable t where t.restaurant.id = :id", RestaurantTable.class);
+        query.setParameter("id", resId);
+        return query.getResultList();
+    }
 }

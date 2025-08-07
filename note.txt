@@ -1,0 +1,27 @@
+huy(admin)
+- quản lý người dùng
+	+ /admin/user doGet -> lấy danh sách người dùng
+	+ /admin/user doPost -> thêm mới người dùng(customer, restaurant)
+	+ /admin/update-user doPost -> cập nhật người dùng
+- quản lý loại món ăn
+    + /admin/categories doGet -> lấy danh sách loại món ăn
+    + /admin/categories doPost -> thêm loại món ăn
+    + /admin/update-category doPost -> cập nhật loại món ăn
+- thống kê
+    + /api/revenue-statistics doGet -> với role là admin, lấy doanh thu của tất cả nhà hàng trong tháng x, năm y ( được chọn ở fe ). ví dụ response của api [{"revenue":400000.0,"restaurant":"Nhà Hàng Phì Lũ 1"},{"revenue":600000.0,"restaurant":"Nhà Hàng Phì Lũ 2"}]
+    + sau đó dùng chart.js để vẽ biểu đồ
+hiếu (restaurant)
+- quản lý bàn ăn
+    + /restaurant/tables -> doGet, lấy danh sách bàn ăn của 1 nhà hàng
+    + /restaurant/tables -> doPost, thêm bàn, nếu thêm 1 bàn thì chỉ có param from, nếu thêm nhiều bàn thì có thêm param to
+    + /restaurant/edit-table -> doPost cập nhật bàn ăn
+- quản lý món ăn
+    + /restaurant/foods -> doGet, lấy danh sách món ăn của 1 nhà hàng
+    + /restaurant/foods -> doPost, thêm mới 1 món ăn
+    + /restaurant/edit-food -> doPost cập nhật món ăn
+- thống kê
+    + /api/revenue-statistics doGet -> với role là restaurant, lấy doanh thu của nhà hàng theo tuần (tuần bắt đầu tới tuần kết thúc) ví dụ response của api [{"revenue": 0,"week": 29},{"revenue": 400000,"week": 30},{"revenue": 0,"week": 31}]
+- quản lý đơn đặt bàn
+    + /restaurant/bookings doGet -> lấy các đơn đặt bàn của nhà hàng đó ra
+    + /restaurant/cancel doGet -> hủy booking, chỉ có thể hủy booking chưa thanh toán giữ chỗ
+    + /restaurant/no-show doGet -> đánh dấu booking đó khách hàng không tới

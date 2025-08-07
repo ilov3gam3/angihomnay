@@ -11,7 +11,7 @@ import lombok.*;
 @Entity
 @Table(name = "tables")
 public class RestaurantTable extends DistributedEntity {
-    @Column(unique = true, nullable = false)
+//    @Column(unique = true, nullable = false)
     private int number;
     @ManyToOne
     @JoinColumn(name = "restaurant_id")

@@ -38,7 +38,7 @@
       </select>
       <small class="text-muted">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều món.</small>
     </div>
-
+    <h1 class="text-center">↓</h1>
     <div class="d-flex justify-content-center mt-4">
       <canvas onclick="spin()" id="canvas" width="500" height="500"></canvas>
     </div>

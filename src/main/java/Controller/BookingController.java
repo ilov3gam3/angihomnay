@@ -274,7 +274,7 @@ public class BookingController {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             resp.setContentType("application/json");
             String role = req.getParameter("role");
-            BookingDao bookingDao = new BookingDao(); // giả sử bạn đã có DAO này
+            BookingDao bookingDao = new BookingDao();
             if ("restaurant".equals(role)) {
                 int startWeek = Integer.parseInt(req.getParameter("startWeek"));
                 int endWeek = Integer.parseInt(req.getParameter("endWeek"));
